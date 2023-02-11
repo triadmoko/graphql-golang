@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+    caddy:
+      image: caddy:latest
+      ports:
+        - "80:80"
+        - "443:443"
+      restart: unless-stopped
+      volumes:
+        - ./caddy:/data
+        - ./Caddyfile:/etc/caddy/Caddyfile
+
+    graphql:
+      build:
+        dockerfile: ../app/Dockerfile
+        context: ../app/.
+      restart: unless-stopped
+      deploy:
+        replicas: 1
+      ports:
+        - "8081:8081"
+      depends_on:
+        - db
+      volumes:
+        - ../app:/app
+
+    db:
+      image: postgres:latest
+      restart: unless-stopped
+      ports:
+        - "5432:5433"
+      tty: true
+      environment:
+        POSTGRES_USER: postgre
+        POSTGRES_PASSWORD: secret
+        POSTGRES_DB: graphql
+        PGDATA: /var/lib/postgresql/data/pgdata
+      volumes:
+        - ./postgre/data:/var/lib/postgresql/data
+        - ./postgre/pgdata:/var/lib/postgresql/pgdata
