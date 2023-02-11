@@ -1,0 +1,95 @@
+scalar Time
+# Type
+type User {
+  id: String!
+  created_at:Time!
+  updated_at:Time!
+  deleted_at:Time
+  name: String!
+  email: String!
+  password: String!
+  status: String!
+  posts:[Post]!
+  comments:[Comment]!
+  likes:[Like]!
+}
+
+type Post {
+  id: String!
+  created_at:Time!
+  updated_at:Time!
+  deleted_at:Time
+  title: String!
+  description:Int!
+  user:User!
+  like:[Like]!
+}
+
+type Comment {
+  id: String!
+  created_at:Time!
+  updated_at:Time!
+  deleted_at:Time
+  description:String!
+  user:[User]!
+  post:Post!
+  like:[Like]!
+}
+
+type Like {
+  id: String!
+  created_at: Time!
+  updated_at: Time!
+  deleted_at: Time
+  type: String!
+  user:[User]!
+  comment:[Comment]!
+  post:[Post]!
+}
+
+# Input
+input NewUser {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input NewLogin {
+  username: String!
+  password: String!
+}
+
+input NewPost {
+  title: String!
+  description:Int!
+}
+
+input NewComment {
+  title: String!
+  description:Int!
+}
+
+input NewLike {
+  type: String!
+}
+# Query
+type Query {
+  user: [User!]!
+  comment: [Comment!]!
+  like: [Like!]!
+}
+
+# Mutation
+type Mutation {
+  createUser(input:NewUser!): User!
+  updateUser(input:NewUser!): User!
+
+  createPost(input:NewPost!): Post!
+  updatePost(id:String!, input:NewPost!): Post!
+
+  createComment(id:String!, input:NewComment!): Comment!
+  updateComment(input:NewComment!): Comment!
+
+  Like(id:String!, input:NewLike!): Like!
+  UnLike(id:String!, input:NewLike!): Like!
+}

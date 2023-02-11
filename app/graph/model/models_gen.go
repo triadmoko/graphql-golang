@@ -2,39 +2,78 @@
 
 package model
 
-type InputRefreshToken struct {
-	Token string `json:"token"`
+import (
+	"time"
+)
+
+type Comment struct {
+	ID          string     `json:"id"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+	Description string     `json:"description"`
+	User        []*User    `json:"user"`
+	Post        *Post      `json:"post"`
+	Like        []*Like    `json:"like"`
 }
 
-type Link struct {
-	ID      string `json:"id"`
-	Title   string `json:"title"`
-	Address string `json:"address"`
-	User    *User  `json:"user"`
+type Like struct {
+	ID        string     `json:"id"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
+	Type      string     `json:"type"`
+	User      []*User    `json:"user"`
+	Comment   []*Comment `json:"comment"`
+	Post      []*Post    `json:"post"`
 }
 
-type Login struct {
+type NewComment struct {
+	Title       string `json:"title"`
+	Description int    `json:"description"`
+}
+
+type NewLike struct {
+	Type string `json:"type"`
+}
+
+type NewLogin struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-type NewLink struct {
-	Title   string `json:"title"`
-	Address string `json:"address"`
+type NewPost struct {
+	Title       string `json:"title"`
+	Description int    `json:"description"`
 }
 
 type NewUser struct {
-	Username string `json:"username"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type RefreshToken struct {
-	Token string `json:"token"`
+type Post struct {
+	ID          string     `json:"id"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+	Title       string     `json:"title"`
+	Description int        `json:"description"`
+	User        *User      `json:"user"`
+	Like        []*Like    `json:"like"`
 }
 
 type User struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	Age    int    `json:"age"`
-	Active bool   `json:"active"`
+	ID        string     `json:"id"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
+	Name      string     `json:"name"`
+	Email     string     `json:"email"`
+	Password  string     `json:"password"`
+	Status    string     `json:"status"`
+	Posts     []*Post    `json:"posts"`
+	Comments  []*Comment `json:"comments"`
+	Likes     []*Like    `json:"likes"`
 }
