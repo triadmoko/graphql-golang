@@ -1,3 +1,0 @@
-graph.localhost {
-	reverse_proxy http://graphql:8080
-}
