@@ -1,13 +1,15 @@
 package user
 
 import (
+	"context"
+
 	"github.com/sirupsen/logrus"
 	"github.com/triadmoko/grahpql-golang/graph/model"
 	"github.com/triadmoko/grahpql-golang/repository/user"
 )
 
 type UserServices interface {
-	Create(request model.NewUser) (model.User, error)
+	Create(ctx context.Context, req model.NewUser) (*model.User, error)
 }
 type user_service struct {
 	loggger        *logrus.Logger

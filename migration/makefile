@@ -1,7 +1,7 @@
 table = $(table)
 name = $(name)
 
-url=postgres://postgre:secret@127.0.0.1:5431/graphql?sslmode=disable
+url=postgres://spuser:secret@127.0.0.1:5432/graphql?sslmode=disable
 version=$(version)
 migration-up :
 	migrate -database "$(url)" -path ./migrations/ up $(version)

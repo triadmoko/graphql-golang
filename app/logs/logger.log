@@ -4437,3 +4437,13 @@
 2023-02-11 14:33:54,678 - config.go - [line:20] - [31mERROR [0m msg ▶ Error init gormfailed to connect to `host=localhost user=spuser database=graphql`: dial error (dial tcp [::1]:5432: connect: cannot assign requested address)
 2023-02-11 14:38:45,678 - gorm.go - [line:23] - [31mERROR [0m msg ▶ not connect gorm postgrefailed to connect to `host=localhost user=spuser database=graphql`: dial error (dial tcp [::1]:5432: connect: cannot assign requested address)
 2023-02-11 14:38:45,678 - config.go - [line:20] - [31mERROR [0m msg ▶ Error init gormfailed to connect to `host=localhost user=spuser database=graphql`: dial error (dial tcp [::1]:5432: connect: cannot assign requested address)
+ 2023-02-11 16:27:04,678 - create.go - [line:22] - [31mERROR [0m msg ▶ Failed Create User ERROR: relation "users" does not exist (SQLSTATE 42P01)
+ 2023-02-11 16:28:24,678 - create.go - [line:22] - [31mERROR [0m msg ▶ Failed Create User ERROR: invalid input syntax for type boolean: "inactive" (SQLSTATE 22P02)
+ 2023-02-11 16:29:23,678 - create.go - [line:22] - [31mERROR [0m msg ▶ Failed Create User ERROR: invalid input syntax for type boolean: "inactive" (SQLSTATE 22P02)
+ 2023-02-11 16:30:24,678 - create.go - [line:22] - [31mERROR [0m msg ▶ Failed Create User ERROR: invalid input syntax for type boolean: "inactive" (SQLSTATE 22P02)
+ 2023-02-11 16:35:28,678 - create.go - [line:16] - [31mERROR [0m msg ▶ Failed Get User By Email ERROR: invalid input syntax for type uuid: "triadmoko12@gmail.com" (SQLSTATE 22P02)
+ 2023-02-11 16:35:58,678 - create.go - [line:25] - [31mERROR [0m msg ▶ Failed Create User record not found
+ 2023-02-11 16:36:33,678 - create.go - [line:25] - [31mERROR [0m msg ▶ Failed Create User record not found
+ 2023-02-11 16:37:40,678 - create.go - [line:16] - [31mERROR [0m msg ▶ Failed Get User By Email record not found
+ 2023-02-11 16:37:55,678 - create.go - [line:25] - [31mERROR [0m msg ▶ Failed Create User record not found
+ 2023-02-11 16:38:23,678 - create.go - [line:27] - [31mERROR [0m msg ▶ Failed Create User record not found

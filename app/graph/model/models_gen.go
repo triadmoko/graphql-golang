@@ -71,7 +71,6 @@ type User struct {
 	DeletedAt *time.Time `json:"deleted_at"`
 	Name      string     `json:"name"`
 	Email     string     `json:"email"`
-	Password  string     `json:"password"`
 	Status    string     `json:"status"`
 	Posts     []*Post    `json:"posts"`
 	Comments  []*Comment `json:"comments"`

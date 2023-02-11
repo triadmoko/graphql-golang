@@ -6,6 +6,6 @@ CREATE TABLE users (
     email VARCHAR NOT NULL,
     name VARCHAR NULL,
     password VARCHAR NOT NULL,
-    status BOOLEAN NOT NULL,
+    status VARCHAR NOT NULL DEFAULT 'inactive',
     PRIMARY KEY (id)
 );
