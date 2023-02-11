@@ -10,11 +10,18 @@ import (
 
 	"github.com/triadmoko/grahpql-golang/graph"
 	"github.com/triadmoko/grahpql-golang/graph/model"
+	"github.com/triadmoko/grahpql-golang/helpers"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+
+	user, err := r.User.Create(input)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(helpers.PrettyPrint(user))
+	return &user, nil
 }
 
 // UpdateUser is the resolver for the updateUser field.

@@ -5,14 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/triadmoko/grahpql-golang/graph"
 	"github.com/triadmoko/grahpql-golang/graph/resolver"
-	"github.com/triadmoko/grahpql-golang/service/user"
+	"github.com/triadmoko/grahpql-golang/injector"
 )
 
-func GraphqlHandler(us user.UserServices) gin.HandlerFunc {
+func GraphqlHandler(injection *injector.Injector) gin.HandlerFunc {
 	// NewExecutableSchema and Config are in the generated.go file
 	conf := graph.Config{
 		Resolvers: &resolver.Resolver{
-			User: us,
+			User: injection.User,
 		},
 	}
 	exec := graph.NewExecutableSchema(conf)

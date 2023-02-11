@@ -17,10 +17,13 @@ func main() {
 		log.Fatal("Error Load Config", err.Error())
 		return
 	}
-	user := injector.NewInjectorUser(conf)
+
 	// Setting up Gin
 	r := gin.Default()
-	r.POST("/query", handler.GraphqlHandler(user))
+	r.POST("/query",
+		handler.GraphqlHandler(
+			injector.NewInitInjector(conf),
+		))
 
 	r.GET("/", func(c *gin.Context) {
 		h := playground.Handler("GraphQL", "/query")

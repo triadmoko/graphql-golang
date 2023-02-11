@@ -7,7 +7,6 @@ type User {
   deleted_at:Time
   name: String!
   email: String!
-  password: String!
   status: String!
   posts:[Post]!
   comments:[Comment]!
