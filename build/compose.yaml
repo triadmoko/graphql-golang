@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.8"
 services:
     caddy:
       image: caddy:latest
@@ -26,15 +26,17 @@ services:
 
     db:
       image: postgres:latest
-      restart: unless-stopped
-      ports:
-        - "5431:5432"
-      tty: true
+      container_name: full_db_postgres
       environment:
-        POSTGRES_USER: postgre
-        POSTGRES_PASSWORD: secret
-        POSTGRES_DB: graphql
-        PGDATA: /var/lib/postgresql/data/pgdata
+        - POSTGRES_USER=${DB_USER}  
+        - POSTGRES_PASSWORD=${DB_PASS}
+        - POSTGRES_DB=${DB_NAME}
+      ports:
+        - '5432:5432'
       volumes:
-        - ./postgre/data:/var/lib/postgresql/data
-        - ./postgre/pgdata:/var/lib/postgresql/pgdata
+        - pg_data:/var/lib/postgresql/data
+
+
+volumes:
+  pg_data:     
+# Networks to be created to facilitate communication between containers
