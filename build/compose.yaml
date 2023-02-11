@@ -28,7 +28,7 @@ services:
       image: postgres:latest
       restart: unless-stopped
       ports:
-        - "5432:5433"
+        - "5431:5432"
       tty: true
       environment:
         POSTGRES_USER: postgre
