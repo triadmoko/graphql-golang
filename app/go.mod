@@ -8,8 +8,6 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.1
 )
 
-require github.com/lib/pq v1.1.1 // indirect
-
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
@@ -30,7 +28,6 @@ require (
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.5.1
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
