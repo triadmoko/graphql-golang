@@ -13,6 +13,7 @@ func GraphqlHandler(injection *injector.Injector) gin.HandlerFunc {
 	conf := graph.Config{
 		Resolvers: &resolver.Resolver{
 			User: injection.User,
+			Post: injection.Post,
 		},
 	}
 	exec := graph.NewExecutableSchema(conf)

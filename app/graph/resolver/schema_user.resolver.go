@@ -56,11 +56,22 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input *request.Update
 
 // CreatePost is the resolver for the createPost field.
 func (r *mutationResolver) CreatePost(ctx context.Context, input request.NewPost) (*request.Post, error) {
-	post, err := r.Post.Create(ctx, input)
+	sess, oke := ctx.Value("sess").(*helpers.MetaToken)
+	if !oke {
+		return nil, errors.New("session invalid")
+	}
+
+	result, err := r.Post.Create(ctx, input)
 	if err != nil {
 		return nil, err
 	}
-	return post, nil
+
+	user, err := r.User.Detail(ctx, sess.ID)
+	if err != nil {
+		return nil, err
+	}
+	result.User = user
+	return result, nil
 }
 
 // UpdatePost is the resolver for the updatePost field.

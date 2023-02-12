@@ -32,14 +32,13 @@ func FormatterRequestPost(userID string, request request.NewPost) Post {
 	return response
 }
 
-func FormatterResponsePost(post Post, user request.User) request.Post {
+func FormatterResponsePost(post Post) request.Post {
 	response := request.Post{
 		ID:          post.ID,
 		CreatedAt:   post.CreatedAt,
 		UpdatedAt:   post.UpdatedAt,
 		Title:       post.Title,
 		Description: post.Description,
-		// User:        &user,
 	}
 	return response
 }

@@ -8,9 +8,6 @@ type User {
   name: String!
   email: String!
   status: String!
-  posts:[Post]!
-  comments:[Comment]!
-  likes:[Like]!
 }
 
 type Post {
@@ -19,9 +16,7 @@ type Post {
   updated_at:Time!
   title: String!
   description:String!
-  user:User
-  like:[Like]
-  comment:[Comment]
+  user:User!
 }
 
 type Comment {
@@ -74,7 +69,7 @@ input NewLogin {
 
 input NewPost {
   title: String!
-  description:String!
+  description: String!
 }
 
 input NewComment {
