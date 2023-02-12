@@ -7,7 +7,8 @@ import (
 )
 
 func NewInjectorUser(conf *config.Config) userService.UserServices {
+	mail := NewInjectorMail(conf)
 	repository := userRepository.NewUserRepositorys(conf)
-	service := userService.NewUserServices(conf.Logger, repository)
+	service := userService.NewUserServices(conf.Logger, repository, mail)
 	return service
 }

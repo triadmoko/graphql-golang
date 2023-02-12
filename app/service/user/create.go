@@ -33,6 +33,12 @@ func (s *user_service) Create(ctx context.Context, req model.NewUser) (*model.Us
 		return nil, errors.New("server not response")
 	}
 
+	err = s.mailService.EmailVerification(ctx, result.Email, result.ID)
+	if err != nil {
+		s.loggger.Error("Failed Create User ", err.Error())
+		return nil, err
+	}
+
 	response := FormatterResponseUser(*result)
 	return &response, nil
 }

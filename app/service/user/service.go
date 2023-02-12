@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/triadmoko/grahpql-golang/graph/model"
 	"github.com/triadmoko/grahpql-golang/repository/user"
+	"github.com/triadmoko/grahpql-golang/service/mail"
 )
 
 type UserServices interface {
@@ -15,8 +16,13 @@ type UserServices interface {
 type user_service struct {
 	loggger        *logrus.Logger
 	userRepository user.UserRepository
+	mailService    mail.MailServices
 }
 
-func NewUserServices(loggger *logrus.Logger, userRepository user.UserRepository) *user_service {
-	return &user_service{loggger: loggger, userRepository: userRepository}
+func NewUserServices(
+	loggger *logrus.Logger,
+	userRepository user.UserRepository,
+	mailService mail.MailServices,
+) *user_service {
+	return &user_service{loggger: loggger, userRepository: userRepository, mailService: mailService}
 }
