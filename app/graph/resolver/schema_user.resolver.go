@@ -60,17 +60,22 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input request.NewPost
 	if !oke {
 		return nil, errors.New("session invalid")
 	}
-
+	preloads := helpers.GetPreloads(ctx)
 	result, err := r.Post.Create(ctx, input)
 	if err != nil {
 		return nil, err
 	}
-
-	user, err := r.User.Detail(ctx, sess.ID)
-	if err != nil {
-		return nil, err
+	for _, preload := range preloads {
+		switch preload {
+		case "user":
+			user, err := r.User.Detail(ctx, sess.ID)
+			if err != nil {
+				return nil, err
+			}
+			result.User = user
+		}
 	}
-	result.User = user
+
 	return result, nil
 }
 
