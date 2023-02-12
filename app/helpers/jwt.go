@@ -11,19 +11,10 @@ import (
 )
 
 type MetaToken struct {
-	ID            string    `json:"id"`
-	Nis           string    `json:"nis"`
-	Nisn          string    `json:"nisn"`
-	Email         string    `json:"email"`
-	Name          string    `json:"name"`
-	Gender        string    `json:"gender"`
-	Status        bool      `json:"status"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
-	Exp           int64     `json:"exp"`
-	Role          string    `json:"role"`
-	ClientID      string    `json:"client_id"`
-	Authorization bool      `json:"authorization"`
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	Exp           int64  `json:"exp"`
+	Authorization bool   `json:"authorization"`
 }
 
 type AccessToken struct {

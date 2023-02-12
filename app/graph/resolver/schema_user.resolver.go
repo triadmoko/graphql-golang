@@ -6,10 +6,12 @@ package resolver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/triadmoko/grahpql-golang/graph"
 	"github.com/triadmoko/grahpql-golang/graph/model"
+	"github.com/triadmoko/grahpql-golang/helpers"
 )
 
 // Login is the resolver for the Login field.
@@ -66,7 +68,12 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, input model.NewCom
 
 // Like is the resolver for the Like field.
 func (r *mutationResolver) Like(ctx context.Context, id string, input model.NewLike) (*model.Like, error) {
-	panic(fmt.Errorf("not implemented: Like - Like"))
+	sess, oke := ctx.Value("sess").(*helpers.MetaToken)
+	if !oke {
+		return nil, errors.New("session invalid")
+	}
+	fmt.Println(helpers.PrettyPrint(sess))
+	return &model.Like{}, nil
 }
 
 // UnLike is the resolver for the UnLike field.
@@ -86,7 +93,11 @@ func (r *queryResolver) Comment(ctx context.Context) ([]*model.Comment, error) {
 
 // Like is the resolver for the like field.
 func (r *queryResolver) Like(ctx context.Context) ([]*model.Like, error) {
-	panic(fmt.Errorf("not implemented: Like - like"))
+	// sess, oke := ctx.Value("sess").(*helpers.MetaToken)
+	// if !oke {
+	// 	return nil, errors.New("session invalid")
+	// }
+	return nil, nil
 }
 
 // Mutation returns graph.MutationResolver implementation.

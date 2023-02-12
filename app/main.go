@@ -8,6 +8,7 @@ import (
 	"github.com/triadmoko/grahpql-golang/config"
 	"github.com/triadmoko/grahpql-golang/handler"
 	"github.com/triadmoko/grahpql-golang/injector"
+	"github.com/triadmoko/grahpql-golang/middleware"
 )
 
 func main() {
@@ -21,6 +22,7 @@ func main() {
 	// Setting up Gin
 	r := gin.Default()
 	r.POST("/query",
+		middleware.Middleware(),
 		handler.GraphqlHandler(
 			injector.NewInitInjector(conf),
 		))
