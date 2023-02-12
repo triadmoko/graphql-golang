@@ -46,6 +46,9 @@ type Like {
   post:[Post]!
 }
 
+type Token {
+  token: String!
+}
 # Input
 input NewUser {
   name: String!
@@ -54,7 +57,7 @@ input NewUser {
 }
 
 input NewLogin {
-  username: String!
+  email: String!
   password: String!
 }
 
@@ -80,6 +83,8 @@ type Query {
 
 # Mutation
 type Mutation {
+  Login(input:NewLogin!): Token!
+
   createUser(input:NewUser!): User!
   updateUser(input:NewUser!): User!
 

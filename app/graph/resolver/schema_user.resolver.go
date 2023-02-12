@@ -12,6 +12,15 @@ import (
 	"github.com/triadmoko/grahpql-golang/graph/model"
 )
 
+// Login is the resolver for the Login field.
+func (r *mutationResolver) Login(ctx context.Context, input model.NewLogin) (*model.Token, error) {
+	token, err := r.User.Login(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
+}
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	user, err := r.User.Create(ctx, input)

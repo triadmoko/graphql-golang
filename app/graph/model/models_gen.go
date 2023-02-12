@@ -38,7 +38,7 @@ type NewLike struct {
 }
 
 type NewLogin struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -62,6 +62,10 @@ type Post struct {
 	Description int        `json:"description"`
 	User        *User      `json:"user"`
 	Like        []*Like    `json:"like"`
+}
+
+type Token struct {
+	Token string `json:"token"`
 }
 
 type User struct {
