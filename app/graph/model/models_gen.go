@@ -53,6 +53,11 @@ type NewUser struct {
 	Password string `json:"password"`
 }
 
+type NewVerify struct {
+	Email string `json:"email"`
+	Code  int    `json:"code"`
+}
+
 type Post struct {
 	ID          string     `json:"id"`
 	CreatedAt   time.Time  `json:"created_at"`

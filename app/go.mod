@@ -6,14 +6,10 @@ require (
 	github.com/99designs/gqlgen v0.17.24
 	github.com/gin-gonic/gin v1.8.2
 	github.com/vektah/gqlparser/v2 v2.5.1
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
-require (
-	github.com/gorilla/mux v1.8.0 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
-	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
-)
+require gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -40,7 +36,6 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/mailgun/mailgun-go/v4 v4.8.2
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect

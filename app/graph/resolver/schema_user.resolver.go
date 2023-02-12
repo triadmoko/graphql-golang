@@ -30,6 +30,15 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 	return user, nil
 }
 
+// VerifyUser is the resolver for the verifyUser field.
+func (r *mutationResolver) VerifyUser(ctx context.Context, input model.NewVerify) (string, error) {
+	status, err := r.User.VerifyEmail(ctx, input)
+	if err != nil {
+		return "", err
+	}
+	return status, nil
+}
+
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))

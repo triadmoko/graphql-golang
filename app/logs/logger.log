@@ -4499,3 +4499,4 @@
 5.7.8  https://support.google.com/mail/?p=BadCredentials i4-20020a170902eb4400b0019a8530c063sm1900636pli.102 - gsmtp
  2023-02-12 05:38:37,678 - create.go - [line:38] - [31mERROR [0m msg ▶ Failed Create User 535 5.7.8 Username and Password not accepted. Learn more at
 5.7.8  https://support.google.com/mail/?p=BadCredentials i4-20020a170902eb4400b0019a8530c063sm1900636pli.102 - gsmtp
+ 2023-02-12 06:04:48,678 - verify_email.go - [line:23] - [31mERROR [0m msg ▶ Verification expired

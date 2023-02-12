@@ -56,6 +56,11 @@ input NewUser {
   password: String!
 }
 
+input NewVerify {
+  email: String!
+  code: Int!
+}
+
 input NewLogin {
   email: String!
   password: String!
@@ -86,6 +91,7 @@ type Mutation {
   Login(input:NewLogin!): Token!
 
   createUser(input:NewUser!): User!
+  verifyUser(input:NewVerify!): String!
   updateUser(input:NewUser!): User!
 
   createPost(input:NewPost!): Post!

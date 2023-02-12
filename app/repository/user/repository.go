@@ -11,7 +11,9 @@ import (
 
 type UserRepository interface {
 	Create(ctx context.Context, request models.User) (*models.User, error)
+	UpdateStatusUser(ctx context.Context, id, status string) error
 	GetOneByEmail(ctx context.Context, email string) (*models.User, error)
+	GetVerifyByEmail(ctx context.Context, email string) (*models.EmailVerification, error)
 }
 type user_repository struct {
 	loggger *logrus.Logger

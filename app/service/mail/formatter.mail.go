@@ -21,7 +21,7 @@ func FormatterRequestVerificatonEmail(email, userID string) models.EmailVerifica
 		UserID:    userID,
 		Email:     email,
 		Code:      code,
-		Expired:   time.Now().UTC().Unix(),
+		Expired:   time.Now().UTC().Add(1 * time.Minute).Unix(),
 	}
 	return response
 }

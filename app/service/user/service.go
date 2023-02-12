@@ -12,6 +12,7 @@ import (
 type UserServices interface {
 	Create(ctx context.Context, req model.NewUser) (*model.User, error)
 	Login(ctx context.Context, req model.NewLogin) (*model.Token, error)
+	VerifyEmail(ctx context.Context, req model.NewVerify) (string, error)
 }
 type user_service struct {
 	loggger        *logrus.Logger
