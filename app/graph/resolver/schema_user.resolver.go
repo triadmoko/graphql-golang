@@ -42,8 +42,16 @@ func (r *mutationResolver) VerifyUser(ctx context.Context, input model.NewVerify
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+func (r *mutationResolver) UpdateUser(ctx context.Context, input *model.UpdateUser) (*model.User, error) {
+	sess, oke := ctx.Value("sess").(*helpers.MetaToken)
+	if !oke {
+		return nil, errors.New("session invalid")
+	}
+	user, err := r.User.Update(ctx, sess.ID, input)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 // CreatePost is the resolver for the createPost field.

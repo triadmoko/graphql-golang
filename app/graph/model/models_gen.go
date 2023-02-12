@@ -73,6 +73,12 @@ type Token struct {
 	Token string `json:"token"`
 }
 
+type UpdateUser struct {
+	Name     string  `json:"name"`
+	Email    string  `json:"email"`
+	Password *string `json:"password"`
+}
+
 type User struct {
 	ID        string     `json:"id"`
 	CreatedAt time.Time  `json:"created_at"`

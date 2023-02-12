@@ -22,6 +22,22 @@ func FormatterRequestUser(request model.NewUser) models.User {
 	return response
 }
 
+func FormatterRequestUpdateUser(request *model.UpdateUser, status string) models.User {
+	response := models.User{
+		UpdatedAt: time.Now().UTC(),
+		DeletedAt: nil,
+		Name:      request.Name,
+		Email:     request.Email,
+		Status:    status,
+	}
+
+	if request.Password != nil {
+		response.Password = *request.Password
+	}
+
+	return response
+}
+
 func FormatterResponseUser(result models.User) model.User {
 	response := model.User{
 		ID:        result.ID,

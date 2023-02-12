@@ -30,5 +30,4 @@ func (s *user_service) VerifyEmail(ctx context.Context, req model.NewVerify) (st
 		return "", errors.New("verify not found")
 	}
 	return "active", nil
-
 }

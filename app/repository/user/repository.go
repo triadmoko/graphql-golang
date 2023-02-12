@@ -11,6 +11,9 @@ import (
 
 type UserRepository interface {
 	Create(ctx context.Context, request models.User) (*models.User, error)
+	Update(ctx context.Context, id string, user models.User) (*models.User, error)
+	Detail(ctx context.Context, id string) (*models.User, error)
+	
 	UpdateStatusUser(ctx context.Context, id, status string) error
 	GetOneByEmail(ctx context.Context, email string) (*models.User, error)
 	GetVerifyByEmail(ctx context.Context, email string) (*models.EmailVerification, error)
