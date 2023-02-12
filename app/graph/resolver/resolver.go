@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	postService "github.com/triadmoko/grahpql-golang/service/post"
 	userService "github.com/triadmoko/grahpql-golang/service/user"
 )
 
@@ -10,4 +11,5 @@ import (
 
 type Resolver struct {
 	User userService.UserServices
+	Post postService.PostServices
 }

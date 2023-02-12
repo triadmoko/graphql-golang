@@ -17,9 +17,9 @@ func Middleware() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		result := strings.Split(requestToken, " ")
-		requestToken = result[1]
-		token, err := helpers.VerifyTokenHeader(c, "JWT_SECRET", requestToken)
+		splitToken := strings.Split(requestToken, " ")
+		result := splitToken[1]
+		token, err := helpers.VerifyTokenHeader("JWT_SECRET", result)
 		if err != nil {
 			c.Next()
 			return

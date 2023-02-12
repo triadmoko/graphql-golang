@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
-	"github.com/triadmoko/grahpql-golang/graph/model"
+	"github.com/triadmoko/grahpql-golang/graph/request"
 	"github.com/triadmoko/grahpql-golang/helpers"
 	"gorm.io/gorm"
 )
 
-func (s *user_service) Login(ctx context.Context, req model.NewLogin) (*model.Token, error) {
+func (s *user_service) Login(ctx context.Context, req request.NewLogin) (*request.Token, error) {
 	user, err := s.userRepository.GetOneByEmail(ctx, req.Email)
 	if err == gorm.ErrRecordNotFound {
 		return nil, errors.New("user not found")
@@ -37,6 +37,6 @@ func (s *user_service) Login(ctx context.Context, req model.NewLogin) (*model.To
 		s.loggger.Error("invalid sign jwt", err.Error())
 		return nil, errors.New("server not response")
 	}
-	
-	return &model.Token{Token: token}, nil
+
+	return &request.Token{Token: token}, nil
 }

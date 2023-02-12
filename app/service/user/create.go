@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 
-	"github.com/triadmoko/grahpql-golang/graph/model"
+	"github.com/triadmoko/grahpql-golang/graph/request"
 	"github.com/triadmoko/grahpql-golang/helpers"
+	"github.com/triadmoko/grahpql-golang/models"
 	"gorm.io/gorm"
 )
 
-func (s *user_service) Create(ctx context.Context, req model.NewUser) (*model.User, error) {
+func (s *user_service) Create(ctx context.Context, req request.NewUser) (*request.User, error) {
 	user, err := s.userRepository.GetOneByEmail(ctx, req.Email)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		s.loggger.Error("Failed Get User By Email ", err.Error())
@@ -26,7 +27,7 @@ func (s *user_service) Create(ctx context.Context, req model.NewUser) (*model.Us
 		return nil, errors.New("Failed Hass Password")
 	}
 
-	request := FormatterRequestUser(req)
+	request := models.FormatterRequestUser(req)
 	result, err := s.userRepository.Create(ctx, request)
 	if err != nil {
 		s.loggger.Error("Failed Create User ", err.Error())
@@ -39,6 +40,6 @@ func (s *user_service) Create(ctx context.Context, req model.NewUser) (*model.Us
 		return nil, err
 	}
 
-	response := FormatterResponseUser(*result)
+	response := models.FormatterResponseUser(*result)
 	return &response, nil
 }

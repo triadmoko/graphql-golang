@@ -10,12 +10,12 @@ import (
 	"fmt"
 
 	"github.com/triadmoko/grahpql-golang/graph"
-	"github.com/triadmoko/grahpql-golang/graph/model"
+	"github.com/triadmoko/grahpql-golang/graph/request"
 	"github.com/triadmoko/grahpql-golang/helpers"
 )
 
 // Login is the resolver for the Login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.NewLogin) (*model.Token, error) {
+func (r *mutationResolver) Login(ctx context.Context, input request.NewLogin) (*request.Token, error) {
 	token, err := r.User.Login(ctx, input)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.NewLogin) (*mo
 }
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input request.NewUser) (*request.User, error) {
 	user, err := r.User.Create(ctx, input)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 }
 
 // VerifyUser is the resolver for the verifyUser field.
-func (r *mutationResolver) VerifyUser(ctx context.Context, input model.NewVerify) (string, error) {
+func (r *mutationResolver) VerifyUser(ctx context.Context, input request.NewVerify) (string, error) {
 	status, err := r.User.VerifyEmail(ctx, input)
 	if err != nil {
 		return "", err
@@ -42,7 +42,7 @@ func (r *mutationResolver) VerifyUser(ctx context.Context, input model.NewVerify
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, input *model.UpdateUser) (*model.User, error) {
+func (r *mutationResolver) UpdateUser(ctx context.Context, input *request.UpdateUser) (*request.User, error) {
 	sess, oke := ctx.Value("sess").(*helpers.MetaToken)
 	if !oke {
 		return nil, errors.New("session invalid")
@@ -55,52 +55,56 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input *model.UpdateUs
 }
 
 // CreatePost is the resolver for the createPost field.
-func (r *mutationResolver) CreatePost(ctx context.Context, input model.NewPost) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented: CreatePost - createPost"))
+func (r *mutationResolver) CreatePost(ctx context.Context, input request.NewPost) (*request.Post, error) {
+	post, err := r.Post.Create(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	return post, nil
 }
 
 // UpdatePost is the resolver for the updatePost field.
-func (r *mutationResolver) UpdatePost(ctx context.Context, id string, input model.NewPost) (*model.Post, error) {
+func (r *mutationResolver) UpdatePost(ctx context.Context, id string, input request.NewPost) (*request.Post, error) {
 	panic(fmt.Errorf("not implemented: UpdatePost - updatePost"))
 }
 
 // CreateComment is the resolver for the createComment field.
-func (r *mutationResolver) CreateComment(ctx context.Context, id string, input model.NewComment) (*model.Comment, error) {
+func (r *mutationResolver) CreateComment(ctx context.Context, id string, input request.NewComment) (*request.Comment, error) {
 	panic(fmt.Errorf("not implemented: CreateComment - createComment"))
 }
 
 // UpdateComment is the resolver for the updateComment field.
-func (r *mutationResolver) UpdateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
+func (r *mutationResolver) UpdateComment(ctx context.Context, input request.NewComment) (*request.Comment, error) {
 	panic(fmt.Errorf("not implemented: UpdateComment - updateComment"))
 }
 
 // Like is the resolver for the Like field.
-func (r *mutationResolver) Like(ctx context.Context, id string, input model.NewLike) (*model.Like, error) {
+func (r *mutationResolver) Like(ctx context.Context, id string, input request.NewLike) (*request.Like, error) {
 	sess, oke := ctx.Value("sess").(*helpers.MetaToken)
 	if !oke {
 		return nil, errors.New("session invalid")
 	}
 	fmt.Println(helpers.PrettyPrint(sess))
-	return &model.Like{}, nil
+	return &request.Like{}, nil
 }
 
 // UnLike is the resolver for the UnLike field.
-func (r *mutationResolver) UnLike(ctx context.Context, id string, input model.NewLike) (*model.Like, error) {
+func (r *mutationResolver) UnLike(ctx context.Context, id string, input request.NewLike) (*request.Like, error) {
 	panic(fmt.Errorf("not implemented: UnLike - UnLike"))
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context) ([]*model.User, error) {
+func (r *queryResolver) User(ctx context.Context) ([]*request.User, error) {
 	panic(fmt.Errorf("not implemented: User - user"))
 }
 
 // Comment is the resolver for the comment field.
-func (r *queryResolver) Comment(ctx context.Context) ([]*model.Comment, error) {
+func (r *queryResolver) Comment(ctx context.Context) ([]*request.Comment, error) {
 	panic(fmt.Errorf("not implemented: Comment - comment"))
 }
 
 // Like is the resolver for the like field.
-func (r *queryResolver) Like(ctx context.Context) ([]*model.Like, error) {
+func (r *queryResolver) Like(ctx context.Context) ([]*request.Like, error) {
 	// sess, oke := ctx.Value("sess").(*helpers.MetaToken)
 	// if !oke {
 	// 	return nil, errors.New("session invalid")

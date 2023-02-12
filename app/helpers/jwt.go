@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"
 )
@@ -43,7 +42,7 @@ func Sign(Data map[string]interface{}, SecrePublicKeyEnvName string, ExpiredAt t
 	return accessToken, nil
 }
 
-func VerifyTokenHeader(ctx *gin.Context, SecrePublicKeyEnvName, requestToken string) (*AccessToken, error) {
+func VerifyTokenHeader(SecrePublicKeyEnvName, requestToken string) (*AccessToken, error) {
 
 	jwtSecretKey := LoadEnv(SecrePublicKeyEnvName)
 	token, err := jwt.Parse((requestToken), func(token *jwt.Token) (interface{}, error) {

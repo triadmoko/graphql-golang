@@ -1,6 +1,12 @@
 package models
 
-import "time"
+import (
+	"math/rand"
+	"strconv"
+	"time"
+
+	"github.com/triadmoko/grahpql-golang/helpers"
+)
 
 type (
 	FormSendEmail struct {
@@ -19,3 +25,30 @@ type (
 		Expired   int64
 	}
 )
+
+func FormatterRequestVerificatonEmail(email, userID string) EmailVerification {
+	min := 000000
+	max := 999999
+	code := rand.Intn(max-min) + min
+	response := EmailVerification{
+		ID:        helpers.UUID(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		DeletedAt: nil,
+		UserID:    userID,
+		Email:     email,
+		Code:      code,
+		Expired:   time.Now().UTC().Add(1 * time.Minute).Unix(),
+	}
+	return response
+}
+
+func FormatterRequestSendEmail(request EmailVerification) FormSendEmail {
+
+	response := FormSendEmail{
+		Subject: "",
+		Text:    strconv.Itoa(request.Code),
+		To:      []string{request.Email},
+	}
+	return response
+}

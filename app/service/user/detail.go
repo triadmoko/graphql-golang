@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 
-	"github.com/triadmoko/grahpql-golang/graph/model"
+	"github.com/triadmoko/grahpql-golang/graph/request"
+	"github.com/triadmoko/grahpql-golang/models"
 	"gorm.io/gorm"
 )
 
-func (s *user_service) Detail(ctx context.Context, id string) (*model.User, error) {
+func (s *user_service) Detail(ctx context.Context, id string) (*request.User, error) {
 	result, err := s.userRepository.Detail(ctx, id)
 	if err == gorm.ErrRecordNotFound {
 		return nil, errors.New("User not found")
@@ -17,6 +18,6 @@ func (s *user_service) Detail(ctx context.Context, id string) (*model.User, erro
 		s.loggger.Error("Error get detail user")
 		return nil, errors.New("Server not response")
 	}
-	response := FormatterResponseUser(*result)
+	response := models.FormatterResponseUser(*result)
 	return &response, nil
 }

@@ -17,11 +17,11 @@ type Post {
   id: String!
   created_at:Time!
   updated_at:Time!
-  deleted_at:Time
   title: String!
-  description:Int!
-  user:User!
-  like:[Like]!
+  description:String!
+  user:User
+  like:[Like]
+  comment:[Comment]
 }
 
 type Comment {
@@ -30,7 +30,7 @@ type Comment {
   updated_at:Time!
   deleted_at:Time
   description:String!
-  user:[User]!
+  user:User!
   post:Post!
   like:[Like]!
 }
@@ -74,7 +74,7 @@ input NewLogin {
 
 input NewPost {
   title: String!
-  description:Int!
+  description:String!
 }
 
 input NewComment {

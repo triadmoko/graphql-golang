@@ -4,18 +4,18 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
-	"github.com/triadmoko/grahpql-golang/graph/model"
+	"github.com/triadmoko/grahpql-golang/graph/request"
 	"github.com/triadmoko/grahpql-golang/repository/user"
 	"github.com/triadmoko/grahpql-golang/service/mail"
 )
 
 type UserServices interface {
-	Create(ctx context.Context, req model.NewUser) (*model.User, error)
-	Detail(ctx context.Context, id string) (*model.User, error)
-	Update(ctx context.Context, id string, req *model.UpdateUser) (*model.User, error)
+	Create(ctx context.Context, req request.NewUser) (*request.User, error)
+	Detail(ctx context.Context, id string) (*request.User, error)
+	Update(ctx context.Context, id string, req *request.UpdateUser) (*request.User, error)
 
-	Login(ctx context.Context, req model.NewLogin) (*model.Token, error)
-	VerifyEmail(ctx context.Context, req model.NewVerify) (string, error)
+	Login(ctx context.Context, req request.NewLogin) (*request.Token, error)
+	VerifyEmail(ctx context.Context, req request.NewVerify) (string, error)
 }
 type user_service struct {
 	loggger        *logrus.Logger
