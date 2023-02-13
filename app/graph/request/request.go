@@ -17,6 +17,14 @@ type Comment struct {
 	Like        []*Like    `json:"like"`
 }
 
+type FilterPost struct {
+	ID      []*string `json:"id"`
+	Title   *string   `json:"title"`
+	UserID  []*string `json:"user_id"`
+	Page    int       `json:"page"`
+	PerPage int       `json:"per_page"`
+}
+
 type Like struct {
 	ID        string     `json:"id"`
 	CreatedAt time.Time  `json:"created_at"`
@@ -58,6 +66,13 @@ type NewVerify struct {
 	Code  int    `json:"code"`
 }
 
+type Pagination struct {
+	PerPage   int `json:"per_page"`
+	Page      int `json:"page"`
+	TotalPage int `json:"total_page"`
+	TotalData int `json:"total_data"`
+}
+
 type Post struct {
 	ID          string    `json:"id"`
 	CreatedAt   time.Time `json:"created_at"`
@@ -65,6 +80,11 @@ type Post struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	User        *User     `json:"user"`
+}
+
+type PostList struct {
+	Posts      []*Post     `json:"posts"`
+	Pagination *Pagination `json:"pagination"`
 }
 
 type Token struct {

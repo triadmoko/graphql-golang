@@ -19,6 +19,17 @@ type Post {
   user:User!
 }
 
+type Pagination {
+  per_page:Int!
+  page:Int!
+  total_page:Int!
+  total_data:Int!
+}
+type PostList {
+  posts:[Post]!
+  pagination: Pagination!
+}
+
 type Comment {
   id: String!
   created_at:Time!
@@ -72,6 +83,14 @@ input NewPost {
   description: String!
 }
 
+input FilterPost {
+  id: [String]
+  title: String
+  user_id: [String]
+  page:Int!
+  per_page: Int!
+}
+
 input NewComment {
   title: String!
   description:Int!
@@ -83,6 +102,7 @@ input NewLike {
 # Query
 type Query {
   user: [User!]!
+  postList (filter:FilterPost): PostList!
   comment: [Comment!]!
   like: [Like!]!
 }

@@ -14,6 +14,7 @@ type PostServices interface {
 	Update(ctx context.Context, id string, req request.NewPost) (*request.Post, error)
 	Detail(ctx context.Context, id string) (*request.Post, error)
 	Delete(ctx context.Context, id string) error
+	List(ctx context.Context, req request.FilterPost) (*request.PostList, error) 
 }
 type post_service struct {
 	loggger        *logrus.Logger

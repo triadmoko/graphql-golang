@@ -82,6 +82,13 @@ type ComplexityRoot struct {
 		VerifyUser    func(childComplexity int, input request.NewVerify) int
 	}
 
+	Pagination struct {
+		Page      func(childComplexity int) int
+		PerPage   func(childComplexity int) int
+		TotalData func(childComplexity int) int
+		TotalPage func(childComplexity int) int
+	}
+
 	Post struct {
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
@@ -91,10 +98,16 @@ type ComplexityRoot struct {
 		User        func(childComplexity int) int
 	}
 
+	PostList struct {
+		Pagination func(childComplexity int) int
+		Posts      func(childComplexity int) int
+	}
+
 	Query struct {
-		Comment func(childComplexity int) int
-		Like    func(childComplexity int) int
-		User    func(childComplexity int) int
+		Comment  func(childComplexity int) int
+		Like     func(childComplexity int) int
+		PostList func(childComplexity int, filter *request.FilterPost) int
+		User     func(childComplexity int) int
 	}
 
 	Token struct {
@@ -128,6 +141,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	User(ctx context.Context) ([]*request.User, error)
+	PostList(ctx context.Context, filter *request.FilterPost) (*request.PostList, error)
 	Comment(ctx context.Context) ([]*request.Comment, error)
 	Like(ctx context.Context) ([]*request.Like, error)
 }
@@ -403,6 +417,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.VerifyUser(childComplexity, args["input"].(request.NewVerify)), true
 
+	case "Pagination.page":
+		if e.complexity.Pagination.Page == nil {
+			break
+		}
+
+		return e.complexity.Pagination.Page(childComplexity), true
+
+	case "Pagination.per_page":
+		if e.complexity.Pagination.PerPage == nil {
+			break
+		}
+
+		return e.complexity.Pagination.PerPage(childComplexity), true
+
+	case "Pagination.total_data":
+		if e.complexity.Pagination.TotalData == nil {
+			break
+		}
+
+		return e.complexity.Pagination.TotalData(childComplexity), true
+
+	case "Pagination.total_page":
+		if e.complexity.Pagination.TotalPage == nil {
+			break
+		}
+
+		return e.complexity.Pagination.TotalPage(childComplexity), true
+
 	case "Post.created_at":
 		if e.complexity.Post.CreatedAt == nil {
 			break
@@ -445,6 +487,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Post.User(childComplexity), true
 
+	case "PostList.pagination":
+		if e.complexity.PostList.Pagination == nil {
+			break
+		}
+
+		return e.complexity.PostList.Pagination(childComplexity), true
+
+	case "PostList.posts":
+		if e.complexity.PostList.Posts == nil {
+			break
+		}
+
+		return e.complexity.PostList.Posts(childComplexity), true
+
 	case "Query.comment":
 		if e.complexity.Query.Comment == nil {
 			break
@@ -458,6 +514,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Like(childComplexity), true
+
+	case "Query.postList":
+		if e.complexity.Query.PostList == nil {
+			break
+		}
+
+		args, err := ec.field_Query_postList_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PostList(childComplexity, args["filter"].(*request.FilterPost)), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -530,6 +598,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputFilterPost,
 		ec.unmarshalInputNewComment,
 		ec.unmarshalInputNewLike,
 		ec.unmarshalInputNewLogin,
@@ -844,6 +913,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_postList_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *request.FilterPost
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOFilterPost2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐFilterPost(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -2477,6 +2561,182 @@ func (ec *executionContext) fieldContext_Mutation_UnLike(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Pagination_per_page(ctx context.Context, field graphql.CollectedField, obj *request.Pagination) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Pagination_per_page(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PerPage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Pagination_per_page(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Pagination",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Pagination_page(ctx context.Context, field graphql.CollectedField, obj *request.Pagination) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Pagination_page(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Page, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Pagination_page(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Pagination",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Pagination_total_page(ctx context.Context, field graphql.CollectedField, obj *request.Pagination) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Pagination_total_page(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalPage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Pagination_total_page(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Pagination",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Pagination_total_data(ctx context.Context, field graphql.CollectedField, obj *request.Pagination) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Pagination_total_data(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalData, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Pagination_total_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Pagination",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Post_id(ctx context.Context, field graphql.CollectedField, obj *request.Post) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Post_id(ctx, field)
 	if err != nil {
@@ -2757,6 +3017,118 @@ func (ec *executionContext) fieldContext_Post_user(ctx context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _PostList_posts(ctx context.Context, field graphql.CollectedField, obj *request.PostList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PostList_posts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Posts, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*request.Post)
+	fc.Result = res
+	return ec.marshalNPost2ᚕᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐPost(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PostList_posts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PostList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Post_id(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Post_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Post_updated_at(ctx, field)
+			case "title":
+				return ec.fieldContext_Post_title(ctx, field)
+			case "description":
+				return ec.fieldContext_Post_description(ctx, field)
+			case "user":
+				return ec.fieldContext_Post_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PostList_pagination(ctx context.Context, field graphql.CollectedField, obj *request.PostList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PostList_pagination(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Pagination, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*request.Pagination)
+	fc.Result = res
+	return ec.marshalNPagination2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐPagination(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PostList_pagination(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PostList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "per_page":
+				return ec.fieldContext_Pagination_per_page(ctx, field)
+			case "page":
+				return ec.fieldContext_Pagination_page(ctx, field)
+			case "total_page":
+				return ec.fieldContext_Pagination_total_page(ctx, field)
+			case "total_data":
+				return ec.fieldContext_Pagination_total_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Pagination", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_user(ctx, field)
 	if err != nil {
@@ -2812,6 +3184,66 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_postList(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_postList(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PostList(rctx, fc.Args["filter"].(*request.FilterPost))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*request.PostList)
+	fc.Result = res
+	return ec.marshalNPostList2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐPostList(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_postList(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "posts":
+				return ec.fieldContext_PostList_posts(ctx, field)
+			case "pagination":
+				return ec.fieldContext_PostList_pagination(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PostList", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_postList_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -5187,6 +5619,66 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputFilterPost(ctx context.Context, obj interface{}) (request.FilterPost, error) {
+	var it request.FilterPost
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "title", "user_id", "page", "per_page"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOString2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "user_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
+			it.UserID, err = ec.unmarshalOString2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "page":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+			it.Page, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "per_page":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("per_page"))
+			it.PerPage, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj interface{}) (request.NewComment, error) {
 	var it request.NewComment
 	asMap := map[string]interface{}{}
@@ -5701,6 +6193,55 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var paginationImplementors = []string{"Pagination"}
+
+func (ec *executionContext) _Pagination(ctx context.Context, sel ast.SelectionSet, obj *request.Pagination) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, paginationImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Pagination")
+		case "per_page":
+
+			out.Values[i] = ec._Pagination_per_page(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "page":
+
+			out.Values[i] = ec._Pagination_page(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "total_page":
+
+			out.Values[i] = ec._Pagination_total_page(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "total_data":
+
+			out.Values[i] = ec._Pagination_total_data(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var postImplementors = []string{"Post"}
 
 func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj *request.Post) graphql.Marshaler {
@@ -5764,6 +6305,41 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var postListImplementors = []string{"PostList"}
+
+func (ec *executionContext) _PostList(ctx context.Context, sel ast.SelectionSet, obj *request.PostList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, postListImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PostList")
+		case "posts":
+
+			out.Values[i] = ec._PostList_posts(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pagination":
+
+			out.Values[i] = ec._PostList_pagination(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -5792,6 +6368,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_user(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "postList":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_postList(ctx, field)
 				return res
 			}
 
@@ -6527,6 +7123,16 @@ func (ec *executionContext) unmarshalNNewVerify2githubᚗcomᚋtriadmokoᚋgrahp
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNPagination2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐPagination(ctx context.Context, sel ast.SelectionSet, v *request.Pagination) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Pagination(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNPost2githubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐPost(ctx context.Context, sel ast.SelectionSet, v request.Post) graphql.Marshaler {
 	return ec._Post(ctx, sel, &v)
 }
@@ -6577,6 +7183,20 @@ func (ec *executionContext) marshalNPost2ᚖgithubᚗcomᚋtriadmokoᚋgrahpql�
 		return graphql.Null
 	}
 	return ec._Post(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPostList2githubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐPostList(ctx context.Context, sel ast.SelectionSet, v request.PostList) graphql.Marshaler {
+	return ec._PostList(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPostList2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐPostList(ctx context.Context, sel ast.SelectionSet, v *request.PostList) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PostList(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -7005,6 +7625,14 @@ func (ec *executionContext) marshalOComment2ᚖgithubᚗcomᚋtriadmokoᚋgrahpq
 	return ec._Comment(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOFilterPost2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐFilterPost(ctx context.Context, v interface{}) (*request.FilterPost, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFilterPost(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalOLike2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐLike(ctx context.Context, sel ast.SelectionSet, v *request.Like) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -7017,6 +7645,38 @@ func (ec *executionContext) marshalOPost2ᚖgithubᚗcomᚋtriadmokoᚋgrahpql�
 		return graphql.Null
 	}
 	return ec._Post(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOString2ᚖstring(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOString2ᚖstring(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
