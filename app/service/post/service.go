@@ -11,6 +11,9 @@ import (
 
 type PostServices interface {
 	Create(ctx context.Context, req request.NewPost) (*request.Post, error)
+	Update(ctx context.Context, id string, req request.NewPost) (*request.Post, error)
+	Detail(ctx context.Context, id string) (*request.Post, error)
+	Delete(ctx context.Context, id string) error
 }
 type post_service struct {
 	loggger        *logrus.Logger

@@ -11,6 +11,9 @@ import (
 
 type PostRepository interface {
 	Create(ctx context.Context, request models.Post) (*models.Post, error)
+	Update(ctx context.Context, id string, post models.Post) (*models.Post, error)
+	Detail(ctx context.Context, id, userID string) (*models.Post, error)
+	Delete(ctx context.Context, id, userID string) error
 }
 type post_repository struct {
 	loggger *logrus.Logger

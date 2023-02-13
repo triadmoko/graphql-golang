@@ -42,3 +42,12 @@ func FormatterResponsePost(post Post) request.Post {
 	}
 	return response
 }
+
+func FormatterUpdatePost(post request.NewPost) Post {
+	response := Post{
+		Title:       post.Title,
+		Description: post.Description,
+		UpdatedAt:   time.Now().UTC(),
+	}
+	return response
+}

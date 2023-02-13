@@ -81,7 +81,64 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input request.NewPost
 
 // UpdatePost is the resolver for the updatePost field.
 func (r *mutationResolver) UpdatePost(ctx context.Context, id string, input request.NewPost) (*request.Post, error) {
-	panic(fmt.Errorf("not implemented: UpdatePost - updatePost"))
+	sess, oke := ctx.Value("sess").(*helpers.MetaToken)
+	if !oke {
+		return nil, errors.New("session invalid")
+	}
+	preloads := helpers.GetPreloads(ctx)
+	result, err := r.Post.Update(ctx, id, input)
+	if err != nil {
+		return nil, err
+	}
+	for _, preload := range preloads {
+		switch preload {
+		case "user":
+			user, err := r.User.Detail(ctx, sess.ID)
+			if err != nil {
+				return nil, err
+			}
+			result.User = user
+		}
+	}
+
+	return result, nil
+}
+
+// DetailPost is the resolver for the detailPost field.
+func (r *mutationResolver) DetailPost(ctx context.Context, id string) (*request.Post, error) {
+	sess, oke := ctx.Value("sess").(*helpers.MetaToken)
+	if !oke {
+		return nil, errors.New("session invalid")
+	}
+	preloads := helpers.GetPreloads(ctx)
+	post, err := r.Post.Detail(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	for _, preload := range preloads {
+		switch preload {
+		case "user":
+			user, err := r.User.Detail(ctx, sess.ID)
+			if err != nil {
+				return nil, err
+			}
+			post.User = user
+		case "comment":
+
+		case "like":
+
+		}
+	}
+	return post, nil
+}
+
+// DeletePost is the resolver for the deletePost field.
+func (r *mutationResolver) DeletePost(ctx context.Context, id string) (string, error) {
+	err := r.Post.Delete(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return "success deleted post", nil
 }
 
 // CreateComment is the resolver for the createComment field.

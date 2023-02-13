@@ -97,6 +97,8 @@ type Mutation {
 
   createPost(input:NewPost!): Post!
   updatePost(id:String!, input:NewPost!): Post!
+  detailPost(id:String!): Post!
+  deletePost(id:String!): String!
 
   createComment(id:String!, input:NewComment!): Comment!
   updateComment(input:NewComment!): Comment!
