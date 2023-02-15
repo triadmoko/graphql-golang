@@ -17,6 +17,17 @@ type Comment struct {
 	Like        []*Like    `json:"like"`
 }
 
+type CommentList struct {
+	Comments   []*Comment  `json:"comments"`
+	Pagination *Pagination `json:"pagination"`
+}
+
+type FilterComment struct {
+	PostID  string `json:"post_id"`
+	Page    int    `json:"page"`
+	PerPage int    `json:"per_page"`
+}
+
 type FilterPost struct {
 	ID      []*string `json:"id"`
 	Title   *string   `json:"title"`
@@ -37,8 +48,9 @@ type Like struct {
 }
 
 type NewComment struct {
-	Title       string `json:"title"`
-	Description int    `json:"description"`
+	UserID      *string `json:"user_id"`
+	PostID      string  `json:"post_id"`
+	Description string  `json:"description"`
 }
 
 type NewLike struct {
@@ -74,12 +86,13 @@ type Pagination struct {
 }
 
 type Post struct {
-	ID          string    `json:"id"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	User        *User     `json:"user"`
+	ID          string       `json:"id"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+	Title       string       `json:"title"`
+	Description string       `json:"description"`
+	User        *User        `json:"user"`
+	Comments    *CommentList `json:"comments"`
 }
 
 type PostList struct {

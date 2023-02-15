@@ -54,7 +54,7 @@ func (p *PostList) GetSort() string {
 	return p.Sort
 }
 
-func Paginate(value interface{}, pagination *PostList, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
+func PaginatePost(value interface{}, pagination *PostList, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
 	var totalRows int64
 	db.Model(value).Count(&totalRows)
 

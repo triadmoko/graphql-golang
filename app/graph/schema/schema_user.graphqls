@@ -17,6 +17,7 @@ type Post {
   title: String!
   description:String!
   user:User!
+  comments:CommentList
 }
 
 type Pagination {
@@ -25,10 +26,12 @@ type Pagination {
   total_page:Int!
   total_data:Int!
 }
+
 type PostList {
   posts:[Post]!
   pagination: Pagination!
 }
+
 
 type Comment {
   id: String!
@@ -39,6 +42,11 @@ type Comment {
   user:User!
   post:Post!
   like:[Like]!
+}
+
+type CommentList {
+  comments:[Comment]!
+  pagination: Pagination!
 }
 
 type Like {
@@ -87,24 +95,32 @@ input FilterPost {
   id: [String]
   title: String
   user_id: [String]
-  page:Int!
+  page: Int!
+  per_page: Int!
+}
+
+input FilterComment {
+  post_id: String!
+  page: Int!
   per_page: Int!
 }
 
 input NewComment {
-  title: String!
-  description:Int!
+  user_id: String
+  post_id: String!
+  description:String!
 }
 
 input NewLike {
   type: String!
 }
+
 # Query
 type Query {
   user: [User!]!
   postList (filter:FilterPost): PostList!
-  comment: [Comment!]!
-  like: [Like!]!
+  detailPost(id:String!): Post!
+
 }
 
 # Mutation
@@ -120,8 +136,9 @@ type Mutation {
   detailPost(id:String!): Post!
   deletePost(id:String!): String!
 
-  createComment(id:String!, input:NewComment!): Comment!
-  updateComment(input:NewComment!): Comment!
+  createComment(input:NewComment!): Comment!
+  updateComment(id:String!, input:NewComment!): Comment!
+  deleteComment(id:String!): String!
 
   Like(id:String!, input:NewLike!): Like!
   UnLike(id:String!, input:NewLike!): Like!

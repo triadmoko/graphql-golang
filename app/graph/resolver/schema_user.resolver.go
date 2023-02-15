@@ -123,8 +123,12 @@ func (r *mutationResolver) DetailPost(ctx context.Context, id string) (*request.
 				return nil, err
 			}
 			post.User = user
-		case "comment":
-
+		case "comments":
+			comments, err := r.Comment.CommentList(ctx, request.FilterComment{PostID: post.ID, Page: 1, PerPage: 100})
+			if err != nil {
+				return nil, err
+			}
+			post.Comments = comments
 		case "like":
 
 		}
@@ -142,13 +146,30 @@ func (r *mutationResolver) DeletePost(ctx context.Context, id string) (string, e
 }
 
 // CreateComment is the resolver for the createComment field.
-func (r *mutationResolver) CreateComment(ctx context.Context, id string, input request.NewComment) (*request.Comment, error) {
-	panic(fmt.Errorf("not implemented: CreateComment - createComment"))
+func (r *mutationResolver) CreateComment(ctx context.Context, input request.NewComment) (*request.Comment, error) {
+	result, err := r.Comment.Create(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // UpdateComment is the resolver for the updateComment field.
-func (r *mutationResolver) UpdateComment(ctx context.Context, input request.NewComment) (*request.Comment, error) {
-	panic(fmt.Errorf("not implemented: UpdateComment - updateComment"))
+func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input request.NewComment) (*request.Comment, error) {
+	result, err := r.Comment.Update(ctx, id, input)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// DeleteComment is the resolver for the deleteComment field.
+func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (string, error) {
+	err := r.Comment.Delete(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return "success deleted comment", nil
 }
 
 // Like is the resolver for the Like field.
@@ -180,18 +201,9 @@ func (r *queryResolver) PostList(ctx context.Context, filter *request.FilterPost
 	return response, nil
 }
 
-// Comment is the resolver for the comment field.
-func (r *queryResolver) Comment(ctx context.Context) ([]*request.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comment - comment"))
-}
-
-// Like is the resolver for the like field.
-func (r *queryResolver) Like(ctx context.Context) ([]*request.Like, error) {
-	// sess, oke := ctx.Value("sess").(*helpers.MetaToken)
-	// if !oke {
-	// 	return nil, errors.New("session invalid")
-	// }
-	return nil, nil
+// DetailPost is the resolver for the detailPost field.
+func (r *queryResolver) DetailPost(ctx context.Context, id string) (*request.Post, error) {
+	panic(fmt.Errorf("not implemented: DetailPost - detailPost"))
 }
 
 // Mutation returns graph.MutationResolver implementation.
@@ -209,6 +221,19 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) CommentList(ctx context.Context, filter *request.FilterComment) (*request.CommentList, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+func (r *queryResolver) Comment(ctx context.Context) ([]*request.Comment, error) {
+	panic(fmt.Errorf("not implemented: Comment - comment"))
+}
+func (r *queryResolver) Like(ctx context.Context) ([]*request.Like, error) {
+	// sess, oke := ctx.Value("sess").(*helpers.MetaToken)
+	// if !oke {
+	// 	return nil, errors.New("session invalid")
+	// }
+	return nil, nil
+}
 func (r *queryResolver) List(ctx context.Context, filter *request.FilterPost) ([]*request.PostList, error) {
 	panic(fmt.Errorf("not implemented: List - list"))
 }

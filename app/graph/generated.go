@@ -56,6 +56,11 @@ type ComplexityRoot struct {
 		User        func(childComplexity int) int
 	}
 
+	CommentList struct {
+		Comments   func(childComplexity int) int
+		Pagination func(childComplexity int) int
+	}
+
 	Like struct {
 		Comment   func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
@@ -68,15 +73,16 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateComment func(childComplexity int, id string, input request.NewComment) int
+		CreateComment func(childComplexity int, input request.NewComment) int
 		CreatePost    func(childComplexity int, input request.NewPost) int
 		CreateUser    func(childComplexity int, input request.NewUser) int
+		DeleteComment func(childComplexity int, id string) int
 		DeletePost    func(childComplexity int, id string) int
 		DetailPost    func(childComplexity int, id string) int
 		Like          func(childComplexity int, id string, input request.NewLike) int
 		Login         func(childComplexity int, input request.NewLogin) int
 		UnLike        func(childComplexity int, id string, input request.NewLike) int
-		UpdateComment func(childComplexity int, input request.NewComment) int
+		UpdateComment func(childComplexity int, id string, input request.NewComment) int
 		UpdatePost    func(childComplexity int, id string, input request.NewPost) int
 		UpdateUser    func(childComplexity int, input *request.UpdateUser) int
 		VerifyUser    func(childComplexity int, input request.NewVerify) int
@@ -90,6 +96,7 @@ type ComplexityRoot struct {
 	}
 
 	Post struct {
+		Comments    func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -104,10 +111,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Comment  func(childComplexity int) int
-		Like     func(childComplexity int) int
-		PostList func(childComplexity int, filter *request.FilterPost) int
-		User     func(childComplexity int) int
+		DetailPost func(childComplexity int, id string) int
+		PostList   func(childComplexity int, filter *request.FilterPost) int
+		User       func(childComplexity int) int
 	}
 
 	Token struct {
@@ -134,16 +140,16 @@ type MutationResolver interface {
 	UpdatePost(ctx context.Context, id string, input request.NewPost) (*request.Post, error)
 	DetailPost(ctx context.Context, id string) (*request.Post, error)
 	DeletePost(ctx context.Context, id string) (string, error)
-	CreateComment(ctx context.Context, id string, input request.NewComment) (*request.Comment, error)
-	UpdateComment(ctx context.Context, input request.NewComment) (*request.Comment, error)
+	CreateComment(ctx context.Context, input request.NewComment) (*request.Comment, error)
+	UpdateComment(ctx context.Context, id string, input request.NewComment) (*request.Comment, error)
+	DeleteComment(ctx context.Context, id string) (string, error)
 	Like(ctx context.Context, id string, input request.NewLike) (*request.Like, error)
 	UnLike(ctx context.Context, id string, input request.NewLike) (*request.Like, error)
 }
 type QueryResolver interface {
 	User(ctx context.Context) ([]*request.User, error)
 	PostList(ctx context.Context, filter *request.FilterPost) (*request.PostList, error)
-	Comment(ctx context.Context) ([]*request.Comment, error)
-	Like(ctx context.Context) ([]*request.Like, error)
+	DetailPost(ctx context.Context, id string) (*request.Post, error)
 }
 
 type executableSchema struct {
@@ -217,6 +223,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.User(childComplexity), true
 
+	case "CommentList.comments":
+		if e.complexity.CommentList.Comments == nil {
+			break
+		}
+
+		return e.complexity.CommentList.Comments(childComplexity), true
+
+	case "CommentList.pagination":
+		if e.complexity.CommentList.Pagination == nil {
+			break
+		}
+
+		return e.complexity.CommentList.Pagination(childComplexity), true
+
 	case "Like.comment":
 		if e.complexity.Like.Comment == nil {
 			break
@@ -283,7 +303,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateComment(childComplexity, args["id"].(string), args["input"].(request.NewComment)), true
+		return e.complexity.Mutation.CreateComment(childComplexity, args["input"].(request.NewComment)), true
 
 	case "Mutation.createPost":
 		if e.complexity.Mutation.CreatePost == nil {
@@ -308,6 +328,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(request.NewUser)), true
+
+	case "Mutation.deleteComment":
+		if e.complexity.Mutation.DeleteComment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteComment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteComment(childComplexity, args["id"].(string)), true
 
 	case "Mutation.deletePost":
 		if e.complexity.Mutation.DeletePost == nil {
@@ -379,7 +411,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateComment(childComplexity, args["input"].(request.NewComment)), true
+		return e.complexity.Mutation.UpdateComment(childComplexity, args["id"].(string), args["input"].(request.NewComment)), true
 
 	case "Mutation.updatePost":
 		if e.complexity.Mutation.UpdatePost == nil {
@@ -445,6 +477,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Pagination.TotalPage(childComplexity), true
 
+	case "Post.comments":
+		if e.complexity.Post.Comments == nil {
+			break
+		}
+
+		return e.complexity.Post.Comments(childComplexity), true
+
 	case "Post.created_at":
 		if e.complexity.Post.CreatedAt == nil {
 			break
@@ -501,19 +540,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PostList.Posts(childComplexity), true
 
-	case "Query.comment":
-		if e.complexity.Query.Comment == nil {
+	case "Query.detailPost":
+		if e.complexity.Query.DetailPost == nil {
 			break
 		}
 
-		return e.complexity.Query.Comment(childComplexity), true
-
-	case "Query.like":
-		if e.complexity.Query.Like == nil {
-			break
+		args, err := ec.field_Query_detailPost_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
 		}
 
-		return e.complexity.Query.Like(childComplexity), true
+		return e.complexity.Query.DetailPost(childComplexity, args["id"].(string)), true
 
 	case "Query.postList":
 		if e.complexity.Query.PostList == nil {
@@ -598,6 +635,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputFilterComment,
 		ec.unmarshalInputFilterPost,
 		ec.unmarshalInputNewComment,
 		ec.unmarshalInputNewLike,
@@ -751,24 +789,15 @@ func (ec *executionContext) field_Mutation_UnLike_args(ctx context.Context, rawA
 func (ec *executionContext) field_Mutation_createComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	var arg1 request.NewComment
+	var arg0 request.NewComment
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNNewComment2githubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐNewComment(ctx, tmp)
+		arg0, err = ec.unmarshalNNewComment2githubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐNewComment(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg1
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -799,6 +828,21 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -835,15 +879,24 @@ func (ec *executionContext) field_Mutation_detailPost_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_updateComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 request.NewComment
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewComment2githubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐNewComment(ctx, tmp)
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg0
+	args["id"] = arg0
+	var arg1 request.NewComment
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNNewComment2githubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐNewComment(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -913,6 +966,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_detailPost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -1297,6 +1365,8 @@ func (ec *executionContext) fieldContext_Comment_post(ctx context.Context, field
 				return ec.fieldContext_Post_description(ctx, field)
 			case "user":
 				return ec.fieldContext_Post_user(ctx, field)
+			case "comments":
+				return ec.fieldContext_Post_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -1361,6 +1431,122 @@ func (ec *executionContext) fieldContext_Comment_like(ctx context.Context, field
 				return ec.fieldContext_Like_post(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Like", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CommentList_comments(ctx context.Context, field graphql.CollectedField, obj *request.CommentList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CommentList_comments(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Comments, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*request.Comment)
+	fc.Result = res
+	return ec.marshalNComment2ᚕᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CommentList_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CommentList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Comment_id(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Comment_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Comment_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Comment_deleted_at(ctx, field)
+			case "description":
+				return ec.fieldContext_Comment_description(ctx, field)
+			case "user":
+				return ec.fieldContext_Comment_user(ctx, field)
+			case "post":
+				return ec.fieldContext_Comment_post(ctx, field)
+			case "like":
+				return ec.fieldContext_Comment_like(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CommentList_pagination(ctx context.Context, field graphql.CollectedField, obj *request.CommentList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CommentList_pagination(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Pagination, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*request.Pagination)
+	fc.Result = res
+	return ec.marshalNPagination2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐPagination(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CommentList_pagination(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CommentList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "per_page":
+				return ec.fieldContext_Pagination_per_page(ctx, field)
+			case "page":
+				return ec.fieldContext_Pagination_page(ctx, field)
+			case "total_page":
+				return ec.fieldContext_Pagination_total_page(ctx, field)
+			case "total_data":
+				return ec.fieldContext_Pagination_total_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Pagination", field.Name)
 		},
 	}
 	return fc, nil
@@ -1756,6 +1942,8 @@ func (ec *executionContext) fieldContext_Like_post(ctx context.Context, field gr
 				return ec.fieldContext_Post_description(ctx, field)
 			case "user":
 				return ec.fieldContext_Post_user(ctx, field)
+			case "comments":
+				return ec.fieldContext_Post_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -2065,6 +2253,8 @@ func (ec *executionContext) fieldContext_Mutation_createPost(ctx context.Context
 				return ec.fieldContext_Post_description(ctx, field)
 			case "user":
 				return ec.fieldContext_Post_user(ctx, field)
+			case "comments":
+				return ec.fieldContext_Post_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -2133,6 +2323,8 @@ func (ec *executionContext) fieldContext_Mutation_updatePost(ctx context.Context
 				return ec.fieldContext_Post_description(ctx, field)
 			case "user":
 				return ec.fieldContext_Post_user(ctx, field)
+			case "comments":
+				return ec.fieldContext_Post_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -2201,6 +2393,8 @@ func (ec *executionContext) fieldContext_Mutation_detailPost(ctx context.Context
 				return ec.fieldContext_Post_description(ctx, field)
 			case "user":
 				return ec.fieldContext_Post_user(ctx, field)
+			case "comments":
+				return ec.fieldContext_Post_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -2287,7 +2481,7 @@ func (ec *executionContext) _Mutation_createComment(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateComment(rctx, fc.Args["id"].(string), fc.Args["input"].(request.NewComment))
+		return ec.resolvers.Mutation().CreateComment(rctx, fc.Args["input"].(request.NewComment))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2359,7 +2553,7 @@ func (ec *executionContext) _Mutation_updateComment(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateComment(rctx, fc.Args["input"].(request.NewComment))
+		return ec.resolvers.Mutation().UpdateComment(rctx, fc.Args["id"].(string), fc.Args["input"].(request.NewComment))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2411,6 +2605,60 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteComment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteComment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteComment(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteComment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3017,6 +3265,53 @@ func (ec *executionContext) fieldContext_Post_user(ctx context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _Post_comments(ctx context.Context, field graphql.CollectedField, obj *request.Post) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Post_comments(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Comments, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*request.CommentList)
+	fc.Result = res
+	return ec.marshalOCommentList2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐCommentList(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Post_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Post",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "comments":
+				return ec.fieldContext_CommentList_comments(ctx, field)
+			case "pagination":
+				return ec.fieldContext_CommentList_pagination(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CommentList", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _PostList_posts(ctx context.Context, field graphql.CollectedField, obj *request.PostList) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PostList_posts(ctx, field)
 	if err != nil {
@@ -3068,6 +3363,8 @@ func (ec *executionContext) fieldContext_PostList_posts(ctx context.Context, fie
 				return ec.fieldContext_Post_description(ctx, field)
 			case "user":
 				return ec.fieldContext_Post_user(ctx, field)
+			case "comments":
+				return ec.fieldContext_Post_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -3248,8 +3545,8 @@ func (ec *executionContext) fieldContext_Query_postList(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_comment(ctx, field)
+func (ec *executionContext) _Query_detailPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_detailPost(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3262,7 +3559,7 @@ func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Comment(rctx)
+		return ec.resolvers.Query().DetailPost(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3273,12 +3570,12 @@ func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*request.Comment)
+	res := resTmp.(*request.Post)
 	fc.Result = res
-	return ec.marshalNComment2ᚕᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐCommentᚄ(ctx, field.Selections, res)
+	return ec.marshalNPost2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐPost(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_detailPost(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -3287,85 +3584,33 @@ func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, fiel
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Comment_id(ctx, field)
+				return ec.fieldContext_Post_id(ctx, field)
 			case "created_at":
-				return ec.fieldContext_Comment_created_at(ctx, field)
+				return ec.fieldContext_Post_created_at(ctx, field)
 			case "updated_at":
-				return ec.fieldContext_Comment_updated_at(ctx, field)
-			case "deleted_at":
-				return ec.fieldContext_Comment_deleted_at(ctx, field)
+				return ec.fieldContext_Post_updated_at(ctx, field)
+			case "title":
+				return ec.fieldContext_Post_title(ctx, field)
 			case "description":
-				return ec.fieldContext_Comment_description(ctx, field)
+				return ec.fieldContext_Post_description(ctx, field)
 			case "user":
-				return ec.fieldContext_Comment_user(ctx, field)
-			case "post":
-				return ec.fieldContext_Comment_post(ctx, field)
-			case "like":
-				return ec.fieldContext_Comment_like(ctx, field)
+				return ec.fieldContext_Post_user(ctx, field)
+			case "comments":
+				return ec.fieldContext_Post_comments(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
 	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_like(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_like(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
 	defer func() {
 		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Like(rctx)
-	})
-	if err != nil {
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_detailPost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*request.Like)
-	fc.Result = res
-	return ec.marshalNLike2ᚕᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐLikeᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_like(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Like_id(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Like_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Like_updated_at(ctx, field)
-			case "deleted_at":
-				return ec.fieldContext_Like_deleted_at(ctx, field)
-			case "type":
-				return ec.fieldContext_Like_type(ctx, field)
-			case "user":
-				return ec.fieldContext_Like_user(ctx, field)
-			case "comment":
-				return ec.fieldContext_Like_comment(ctx, field)
-			case "post":
-				return ec.fieldContext_Like_post(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Like", field.Name)
-		},
+		return
 	}
 	return fc, nil
 }
@@ -5619,6 +5864,50 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputFilterComment(ctx context.Context, obj interface{}) (request.FilterComment, error) {
+	var it request.FilterComment
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"post_id", "page", "per_page"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "post_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("post_id"))
+			it.PostID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "page":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+			it.Page, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "per_page":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("per_page"))
+			it.PerPage, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputFilterPost(ctx context.Context, obj interface{}) (request.FilterPost, error) {
 	var it request.FilterPost
 	asMap := map[string]interface{}{}
@@ -5686,18 +5975,26 @@ func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "description"}
+	fieldsInOrder := [...]string{"user_id", "post_id", "description"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "title":
+		case "user_id":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
+			it.UserID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "post_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("post_id"))
+			it.PostID, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5705,7 +6002,7 @@ func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			it.Description, err = ec.unmarshalNInt2int(ctx, v)
+			it.Description, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6021,6 +6318,41 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var commentListImplementors = []string{"CommentList"}
+
+func (ec *executionContext) _CommentList(ctx context.Context, sel ast.SelectionSet, obj *request.CommentList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, commentListImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CommentList")
+		case "comments":
+
+			out.Values[i] = ec._CommentList_comments(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pagination":
+
+			out.Values[i] = ec._CommentList_pagination(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var likeImplementors = []string{"Like"}
 
 func (ec *executionContext) _Like(ctx context.Context, sel ast.SelectionSet, obj *request.Like) graphql.Marshaler {
@@ -6173,6 +6505,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_updateComment(ctx, field)
 			})
 
+		case "deleteComment":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteComment(ctx, field)
+			})
+
 		case "Like":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -6294,6 +6632,10 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "comments":
+
+			out.Values[i] = ec._Post_comments(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6398,7 +6740,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "comment":
+		case "detailPost":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -6407,27 +6749,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_comment(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
-		case "like":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_like(ctx, field)
+				res = ec._Query_detailPost(ctx, field)
 				return res
 			}
 
@@ -6928,50 +7250,6 @@ func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋtriadmokoᚋgra
 	return ret
 }
 
-func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐCommentᚄ(ctx context.Context, sel ast.SelectionSet, v []*request.Comment) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNComment2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐComment(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐComment(ctx context.Context, sel ast.SelectionSet, v *request.Comment) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -7035,50 +7313,6 @@ func (ec *executionContext) marshalNLike2ᚕᚖgithubᚗcomᚋtriadmokoᚋgrahpq
 
 	}
 	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalNLike2ᚕᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐLikeᚄ(ctx context.Context, sel ast.SelectionSet, v []*request.Like) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNLike2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐLike(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
 
 	return ret
 }
@@ -7623,6 +7857,13 @@ func (ec *executionContext) marshalOComment2ᚖgithubᚗcomᚋtriadmokoᚋgrahpq
 		return graphql.Null
 	}
 	return ec._Comment(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCommentList2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐCommentList(ctx context.Context, sel ast.SelectionSet, v *request.CommentList) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CommentList(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOFilterPost2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐFilterPost(ctx context.Context, v interface{}) (*request.FilterPost, error) {
