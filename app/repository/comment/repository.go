@@ -14,7 +14,7 @@ type CommentRepository interface {
 	Delete(ctx context.Context, id, userID string) error
 	Update(ctx context.Context, id string, comment models.Comment) (*models.Comment, error)
 	List(ctx context.Context, comment models.CommentList) (*models.CommentList, error)
-	Detail(ctx context.Context, id, userID string) (*models.Comment, error)
+	Detail(ctx context.Context, id string) (*models.Comment, error)
 }
 type comment_repository struct {
 	loggger *logrus.Logger

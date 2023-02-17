@@ -15,7 +15,7 @@ func (s *comment_service) Update(ctx context.Context, id string, req request.New
 	if !ok {
 		return nil, errors.New("session invalid")
 	}
-	comment, err := s.commentRepository.Detail(ctx, id, sess.ID)
+	comment, err := s.commentRepository.Detail(ctx, id)
 	if err == gorm.ErrRecordNotFound {
 		return nil, errors.New("comment not found")
 	}
@@ -27,7 +27,9 @@ func (s *comment_service) Update(ctx context.Context, id string, req request.New
 	if comment == nil {
 		return nil, errors.New("comment not found")
 	}
-
+	if sess.ID != comment.UserID {
+		return nil, errors.New("your not allow update comment")
+	}
 	formatterReq := models.FormatterUpdateComment(req)
 	comment, err = s.commentRepository.Update(ctx, id, formatterReq)
 	if err != nil {

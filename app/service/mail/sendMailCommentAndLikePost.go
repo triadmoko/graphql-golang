@@ -8,11 +8,11 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-func (s *mail_service) SendEmail(form models.FormSendEmail) error {
+func (s *mail_service) SendEmailCommentAndLike(form models.FormSendEmail) error {
 
 	mg := gomail.NewMessage()
 	mg.SetHeader("To", form.To...)
-	mg.SetHeader("Subject", "Verify Email")
+	mg.SetHeader("Subject", form.Subject)
 	mg.SetBody("text/html", `
 	<!DOCTYPE html>
 <html
@@ -120,7 +120,7 @@ func (s *mail_service) SendEmail(form models.FormSendEmail) error {
                             <td class="alert alert-warning"
                                 style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; color: #fff; font-weight: 500; text-align: center; border-radius: 3px 3px 0 0; background-color: #FF9F00; margin: 0; padding: 20px;"
                                 align="center" bgcolor="#FF9F00" valign="top">
-                                Verifikasi email anda.
+								Your Post
                             </td>
                         </tr>
                         <tr
@@ -130,13 +130,6 @@ func (s *mail_service) SendEmail(form models.FormSendEmail) error {
                                 valign="top">
                                 <table width="100%" cellpadding="0" cellspacing="0"
                                     style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
-                                    <tr
-                                        style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;text-align: center;">
-                                        <td class="content-block"
-                                            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;"
-                                            valign="top">
-                                            Your Code Activation
-                                    </tr>
                                     <tr
                                         style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;text-align: center;">
                                         <td class="content-block"
@@ -175,6 +168,7 @@ func (s *mail_service) SendEmail(form models.FormSendEmail) error {
 	)
 	err := dialer.DialAndSend(mg)
 	if err != nil {
+		s.loggger.Error("Erro send Email", err.Error())
 		return err
 	}
 	return nil

@@ -83,3 +83,36 @@ Membuat API untuk aplikasi Blog yang memiliki fitur:
     ![Create Comment](assets/create_comment.png)
 
     **Create Comment**
+
+     ![Delete Comment](assets/delete_comment.png)
+
+    **Delete Comment**
+
+    Comment dapat di delete ketika komentar tersebut adalaha milik user atau postingan tersebut milik user tersebut
+
+     ![Update Comment](assets/update_comment.png)
+
+    **Update Comment**
+
+4. Terdapat fitur `like` pada setiap posting. Yang dapat melakukan `like` adalah user yang terdaftar.
+
+     ![Like](assets/like_unlike.png)
+
+    **Like and Unlike**
+    Fitur like dan unlike saat pertama kali di hit akan menjadi `like` ketika di hit kedua kalinya akan otomatis menjadi `unlike` dan begitu seterusnya 
+
+     ![Like](assets/total_like.png)
+
+    **Total Like**
+
+5. Terdapat fitur pemberitahuan setiap kali ada user lain yang like dan komentar pada postingan user. Notifikasi dikirmkan ke email.
+
+    ![Mail Comment](assets/send_mail_comment.png)
+
+    **Send Mail Comment**
+
+     ![Mail Comment](assets/send_mail_like.png)
+
+    **Send Mail Like**
+
+6. Jika user `A` misalnya mengomentari postingan user lain, kemudian komentar tersebut dikomentari user lainnya, maka user `A` mendapatkan notifikasi email bahwa komentarnya dikomentari. 

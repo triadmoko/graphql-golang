@@ -14,6 +14,7 @@ import (
 type MailServices interface {
 	EmailVerification(ctx context.Context, email, userID string) error
 	SendEmail(form models.FormSendEmail) error
+	SendEmailCommentAndLike(form models.FormSendEmail) error
 }
 type mail_service struct {
 	loggger        *logrus.Logger

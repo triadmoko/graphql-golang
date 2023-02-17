@@ -13,19 +13,33 @@ func (s *comment_service) Delete(ctx context.Context, id string) error {
 	if !ok {
 		return errors.New("session invalid")
 	}
-	comment, err := s.commentRepository.Detail(ctx, id, sess.ID)
-	if err.Error() == gorm.ErrRecordNotFound.Error() {
+	comment, err := s.commentRepository.Detail(ctx, id)
+	if err == gorm.ErrRecordNotFound {
 		return errors.New("Comment not found")
 	}
 	if err != nil {
 		s.loggger.Error("Error get detail comment")
 		return errors.New("server not response")
 	}
-	err = s.commentRepository.Delete(ctx, comment.ID, comment.UserID)
-	if err != nil {
-		s.loggger.Error("Error delete comment")
+
+	post, err := s.postRepository.DetailByIdOnly(ctx, comment.PostID)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		s.loggger.Error("Error get detail comment")
 		return errors.New("server not response")
 	}
 
+	if post.UserID == sess.ID { // is owner post
+		if err := s.commentRepository.Delete(ctx, comment.ID, comment.UserID); err != nil {
+			s.loggger.Error("Error delete comment")
+			return errors.New("server not response")
+		}
+	} else if comment.UserID == sess.ID { // is owner comment
+		if err := s.commentRepository.Delete(ctx, comment.ID, comment.UserID); err != nil {
+			s.loggger.Error("Error delete comment")
+			return errors.New("server not response")
+		}
+	} else {
+		return errors.New("you are not allow delete comment")
+	}
 	return nil
 }

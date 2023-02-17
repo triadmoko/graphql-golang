@@ -2,7 +2,6 @@ package like
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/triadmoko/grahpql-golang/helpers"
@@ -18,6 +17,5 @@ func (r *like_repository) Count(ctx context.Context, post_id string) (int, error
 	if err != nil {
 		return 0, err
 	}
-	fmt.Println(count)
 	return int(count), nil
 }

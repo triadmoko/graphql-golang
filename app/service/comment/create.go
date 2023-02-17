@@ -15,11 +15,11 @@ func (s *comment_service) Create(ctx context.Context, req request.NewComment) (*
 	if !ok {
 		return nil, errors.New("session invalid")
 	}
-	_, err := s.postRepository.DetailByIdOnly(ctx, req.PostID)
+	post, err := s.postRepository.DetailByIdOnly(ctx, req.PostID)
 	if err == gorm.ErrRecordNotFound {
 		return nil, errors.New("Post Not Found")
 	}
-	
+
 	if err != nil {
 		return nil, errors.New("server not response")
 	}
@@ -30,6 +30,21 @@ func (s *comment_service) Create(ctx context.Context, req request.NewComment) (*
 		s.loggger.Error("Error create comment")
 		return nil, errors.New("server not response")
 	}
+	user, err := s.userRepository.Detail(ctx, post.UserID)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		s.loggger.Error("Error get detail User")
+		return nil, errors.New("server not response")
+	}
 	response := models.FormatterResponseComment(*resultPost)
+	if post.UserID != sess.ID {
+		go s.mailService.SendEmailCommentAndLike(
+			models.FormSendEmail{
+				Subject: "Comment",
+				Text:    "Postingan di komentar oleh " + sess.Name,
+				To:      []string{user.Email},
+			},
+		)
+	}
+
 	return &response, nil
 }

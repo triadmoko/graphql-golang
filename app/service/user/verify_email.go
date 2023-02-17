@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/triadmoko/grahpql-golang/graph/request"
@@ -16,7 +15,6 @@ func (s *user_service) VerifyEmail(ctx context.Context, req request.NewVerify) (
 		s.loggger.Error("verify not found ", err.Error())
 		return "", errors.New("verify not found")
 	}
-	fmt.Println(time.Now().UTC().Unix() - verify.Expired)
 	if time.Now().UTC().Unix() >= verify.Expired {
 		return "", errors.New("Verification expired")
 	}
