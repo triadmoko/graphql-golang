@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jinzhu/gorm"
 	"github.com/triadmoko/grahpql-golang/helpers"
+	"gorm.io/gorm"
 )
 
 func (s *post_service) Delete(ctx context.Context, id string) error {
@@ -14,7 +14,7 @@ func (s *post_service) Delete(ctx context.Context, id string) error {
 		return errors.New("session invalid")
 	}
 	post, err := s.postRepository.Detail(ctx, id, sess.ID)
-	if err.Error() == gorm.ErrRecordNotFound.Error() {
+	if err == gorm.ErrRecordNotFound {
 		return errors.New("Post not found")
 	}
 	if err != nil {

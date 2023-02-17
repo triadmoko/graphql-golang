@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/triadmoko/grahpql-golang/graph/request"
 	"github.com/triadmoko/grahpql-golang/repository/comment"
+	"github.com/triadmoko/grahpql-golang/repository/post"
 )
 
 type CommentServices interface {
@@ -17,14 +18,17 @@ type CommentServices interface {
 type comment_service struct {
 	loggger           *logrus.Logger
 	commentRepository comment.CommentRepository
+	postRepository    post.PostRepository
 }
 
 func NewCommentServices(
 	loggger *logrus.Logger,
 	commentRepository comment.CommentRepository,
+	postRepository post.PostRepository,
 ) *comment_service {
 	return &comment_service{
 		loggger:           loggger,
 		commentRepository: commentRepository,
+		postRepository:    postRepository,
 	}
 }

@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jinzhu/gorm"
 	"github.com/triadmoko/grahpql-golang/graph/request"
 	"github.com/triadmoko/grahpql-golang/helpers"
 	"github.com/triadmoko/grahpql-golang/models"
+	"gorm.io/gorm"
 )
 
 func (s *post_service) Update(ctx context.Context, id string, req request.NewPost) (*request.Post, error) {

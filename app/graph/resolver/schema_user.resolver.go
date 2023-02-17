@@ -151,10 +151,34 @@ func (r *mutationResolver) DeletePost(ctx context.Context, id string) (string, e
 
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, input request.NewComment) (*request.Comment, error) {
+	sess, oke := ctx.Value("sess").(*helpers.MetaToken)
+	if !oke {
+		return nil, errors.New("session invalid")
+	}
+
 	result, err := r.Comment.Create(ctx, input)
 	if err != nil {
 		return nil, err
 	}
+
+	preloads := helpers.GetPreloads(ctx)
+	for _, preload := range preloads {
+		switch preload {
+		case "user":
+			user, err := r.User.Detail(ctx, sess.ID)
+			if err != nil {
+				return nil, err
+			}
+			result.User = user
+		case "post":
+			post, err := r.Post.DetailByIdOnly(ctx, input.PostID)
+			if err != nil {
+				return nil, err
+			}
+			result.Post = post
+		}
+	}
+
 	return result, nil
 }
 

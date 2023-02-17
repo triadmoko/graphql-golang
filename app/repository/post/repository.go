@@ -15,6 +15,7 @@ type PostRepository interface {
 	Detail(ctx context.Context, id, userID string) (*models.Post, error)
 	Delete(ctx context.Context, id, userID string) error
 	List(ctx context.Context, post models.PostList) (*models.PostList, error)
+	DetailByIdOnly(ctx context.Context, id string) (*models.Post, error)
 }
 type post_repository struct {
 	loggger *logrus.Logger

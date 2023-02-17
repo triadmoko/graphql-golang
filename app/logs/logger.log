@@ -2,3 +2,10 @@
  2023-02-13 00:34:43,678 - delete.go - [line:23] - [31mERROR [0m msg ▶ Error get detail post
  2023-02-13 00:35:35,678 - delete.go - [line:23] - [31mERROR [0m msg ▶ Error get detail post
  2023-02-13 00:36:20,678 - delete.go - [line:21] - [31mERROR [0m msg ▶ Error get detail post
+ 2023-02-15 11:13:57,678 - create.go - [line:20] - [31mERROR [0m msg ▶ Error create comment
+ 2023-02-17 02:45:16,678 - create.go - [line:20] - [31mERROR [0m msg ▶ Error Like Post
+ 2023-02-17 03:02:03,678 - email_verifycation.go - [line:19] - [31mERROR [0m msg ▶ 535 5.7.8 Username and Password not accepted. Learn more at
+5.7.8  https://support.google.com/mail/?p=BadCredentials h2-20020a170902f7c200b00186b69157ecsm1968454plw.202 - gsmtp
+ 2023-02-17 03:02:03,678 - create.go - [line:39] - [31mERROR [0m msg ▶ Failed Create User 535 5.7.8 Username and Password not accepted. Learn more at
+5.7.8  https://support.google.com/mail/?p=BadCredentials h2-20020a170902f7c200b00186b69157ecsm1968454plw.202 - gsmtp
+ 2023-02-17 11:18:11,678 - update.go - [line:23] - [31mERROR [0m msg ▶ Error get detail post
