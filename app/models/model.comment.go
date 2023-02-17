@@ -18,6 +18,7 @@ type (
 		UserID      string     `json:"user_id"`
 		PostID      string     `json:"post_id"`
 		Description string     `json:"description"`
+		ParentID    string     `json:"parent_id"`
 	}
 	CommentList struct {
 		PostID    string     `json:"post_id,omitempty"`
@@ -57,7 +58,7 @@ func (p *CommentList) GetSort() string {
 
 func PaginateComment(value interface{}, pagination *CommentList, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
 	var totalRows int64
-	db.Model(value).Count(&totalRows)
+	db.Model(&Comment{}).Count(&totalRows)
 
 	pagination.TotalData = totalRows
 	totalPages := int(math.Ceil(float64(totalRows) / float64(pagination.PerPage)))
@@ -124,4 +125,18 @@ func FormatterResponseCommentList(results CommentList) request.CommentList {
 	}
 
 	return comments
+}
+
+func FormatterRequestAnswerComment(userID, parentID, postID string, req request.NewAnswerComment) Comment {
+	response := Comment{
+		ID:          helpers.UUID(),
+		CreatedAt:   time.Now().UTC(),
+		UpdatedAt:   time.Now().UTC(),
+		DeletedAt:   nil,
+		UserID:      userID,
+		PostID:      postID,
+		Description: req.Description,
+		ParentID:    parentID,
+	}
+	return response
 }

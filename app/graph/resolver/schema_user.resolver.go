@@ -16,7 +16,7 @@ import (
 
 // Login is the resolver for the Login field.
 func (r *mutationResolver) Login(ctx context.Context, input request.NewLogin) (*request.Token, error) {
-	token, err := r.User.Login(ctx, input)
+	token, err := r.UserService.Login(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (r *mutationResolver) Login(ctx context.Context, input request.NewLogin) (*
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input request.NewUser) (*request.User, error) {
-	user, err := r.User.Create(ctx, input)
+	user, err := r.UserService.Create(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input request.NewUser
 
 // VerifyUser is the resolver for the verifyUser field.
 func (r *mutationResolver) VerifyUser(ctx context.Context, input request.NewVerify) (string, error) {
-	status, err := r.User.VerifyEmail(ctx, input)
+	status, err := r.UserService.VerifyEmail(ctx, input)
 	if err != nil {
 		return "", err
 	}
@@ -47,7 +47,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input *request.Update
 	if !oke {
 		return nil, errors.New("session invalid")
 	}
-	user, err := r.User.Update(ctx, sess.ID, input)
+	user, err := r.UserService.Update(ctx, sess.ID, input)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input request.NewPost
 	for _, preload := range preloads {
 		switch preload {
 		case "user":
-			user, err := r.User.Detail(ctx, sess.ID)
+			user, err := r.UserService.Detail(ctx, sess.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -93,7 +93,7 @@ func (r *mutationResolver) UpdatePost(ctx context.Context, id string, input requ
 	for _, preload := range preloads {
 		switch preload {
 		case "user":
-			user, err := r.User.Detail(ctx, sess.ID)
+			user, err := r.UserService.Detail(ctx, sess.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -115,10 +115,11 @@ func (r *mutationResolver) DetailPost(ctx context.Context, id string) (*request.
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(helpers.PrettyPrint(preloads))
 	for _, preload := range preloads {
 		switch preload {
 		case "user":
-			user, err := r.User.Detail(ctx, sess.ID)
+			user, err := r.UserService.Detail(ctx, sess.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -129,6 +130,7 @@ func (r *mutationResolver) DetailPost(ctx context.Context, id string) (*request.
 				return nil, err
 			}
 			post.Comments = comments
+
 		case "total_like":
 			count, err := r.LikeService.Count(ctx, post.ID)
 			if err != nil {
@@ -165,7 +167,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input request.NewC
 	for _, preload := range preloads {
 		switch preload {
 		case "user":
-			user, err := r.User.Detail(ctx, sess.ID)
+			user, err := r.UserService.Detail(ctx, sess.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -179,6 +181,15 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input request.NewC
 		}
 	}
 
+	return result, nil
+}
+
+// AnswerComment is the resolver for the answerComment field.
+func (r *mutationResolver) AnswerComment(ctx context.Context, commentID string, input request.NewAnswerComment) (*request.Comment, error) {
+	result, err := r.Comment.Answer(ctx, commentID, input)
+	if err != nil {
+		return nil, err
+	}
 	return result, nil
 }
 

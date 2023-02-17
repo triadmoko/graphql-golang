@@ -110,6 +110,11 @@ input NewComment {
   description:String!
 }
 
+input NewAnswerComment {
+  user_id: String
+  description:String!
+}
+
 input NewLike {
   user_id: String
   post_id: String!
@@ -137,6 +142,7 @@ type Mutation {
   deletePost(id:String!): String!
 
   createComment(input:NewComment!): Comment!
+  answerComment(comment_id:String!, input:NewAnswerComment!): Comment!
   updateComment(id:String!, input:NewComment!): Comment!
   deleteComment(id:String!): String!
 

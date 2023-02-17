@@ -16,6 +16,7 @@ type CommentServices interface {
 	Update(ctx context.Context, id string, req request.NewComment) (*request.Comment, error)
 	CommentList(ctx context.Context, req request.FilterComment) (*request.CommentList, error)
 	Delete(ctx context.Context, id string) error
+	Answer(ctx context.Context, commentID string, req request.NewAnswerComment) (*request.Comment, error) 
 }
 type comment_service struct {
 	loggger           *logrus.Logger

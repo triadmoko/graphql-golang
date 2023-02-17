@@ -45,6 +45,11 @@ type Like struct {
 	User      *User      `json:"user"`
 }
 
+type NewAnswerComment struct {
+	UserID      *string `json:"user_id"`
+	Description string  `json:"description"`
+}
+
 type NewComment struct {
 	UserID      *string `json:"user_id"`
 	PostID      string  `json:"post_id"`

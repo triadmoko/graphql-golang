@@ -35,7 +35,9 @@ func (s *comment_service) Create(ctx context.Context, req request.NewComment) (*
 		s.loggger.Error("Error get detail User")
 		return nil, errors.New("server not response")
 	}
+	
 	response := models.FormatterResponseComment(*resultPost)
+	
 	if post.UserID != sess.ID {
 		go s.mailService.SendEmailCommentAndLike(
 			models.FormSendEmail{

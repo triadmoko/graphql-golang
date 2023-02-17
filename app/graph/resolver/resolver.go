@@ -13,7 +13,7 @@ import (
 //
 //go:generate go run github.com/99designs/gqlgen generate
 type Resolver struct {
-	User    userService.UserServices
+	UserService    userService.UserServices
 	Post    postService.PostServices
 	Comment commentService.CommentServices
 	LikeService    likeService.LikeService

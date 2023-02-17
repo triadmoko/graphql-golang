@@ -20,6 +20,7 @@ type (
 		Description string     `json:"description"`
 	}
 	PostList struct {
+		Title     string  `json:"title,omitempty"`
 		PerPage   int     `json:"per_page,omitempty;query:limit"`
 		Page      int     `json:"page,omitempty;query:page"`
 		Sort      string  `json:"sort,omitempty;query:sort"`
@@ -54,9 +55,9 @@ func (p *PostList) GetSort() string {
 	return p.Sort
 }
 
-func PaginatePost(value interface{}, pagination *PostList, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
+func PaginatePost(value interface{}, pagination *PostList, db *gorm.DB, where string , args ...interface{}) func(db *gorm.DB) *gorm.DB {
 	var totalRows int64
-	db.Model(value).Count(&totalRows)
+	db.Model(&Post{}).Where(where, args...).Count(&totalRows)
 
 	pagination.TotalData = totalRows
 	totalPages := int(math.Ceil(float64(totalRows) / float64(pagination.PerPage)))
@@ -104,6 +105,9 @@ func FilterPost(filter request.FilterPost) PostList {
 	response := PostList{
 		PerPage: filter.PerPage,
 		Page:    filter.Page,
+	}
+	if filter.Title != nil {
+		response.Title = *filter.Title
 	}
 	return response
 }

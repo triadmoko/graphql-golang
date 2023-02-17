@@ -71,6 +71,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AnswerComment func(childComplexity int, commentID string, input request.NewAnswerComment) int
 		CreateComment func(childComplexity int, input request.NewComment) int
 		CreatePost    func(childComplexity int, input request.NewPost) int
 		CreateUser    func(childComplexity int, input request.NewUser) int
@@ -139,6 +140,7 @@ type MutationResolver interface {
 	DetailPost(ctx context.Context, id string) (*request.Post, error)
 	DeletePost(ctx context.Context, id string) (string, error)
 	CreateComment(ctx context.Context, input request.NewComment) (*request.Comment, error)
+	AnswerComment(ctx context.Context, commentID string, input request.NewAnswerComment) (*request.Comment, error)
 	UpdateComment(ctx context.Context, id string, input request.NewComment) (*request.Comment, error)
 	DeleteComment(ctx context.Context, id string) (string, error)
 	Like(ctx context.Context, input request.NewLike) (*request.Like, error)
@@ -275,6 +277,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Like.User(childComplexity), true
+
+	case "Mutation.answerComment":
+		if e.complexity.Mutation.AnswerComment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_answerComment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AnswerComment(childComplexity, args["comment_id"].(string), args["input"].(request.NewAnswerComment)), true
 
 	case "Mutation.createComment":
 		if e.complexity.Mutation.CreateComment == nil {
@@ -615,6 +629,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputFilterComment,
 		ec.unmarshalInputFilterPost,
+		ec.unmarshalInputNewAnswerComment,
 		ec.unmarshalInputNewComment,
 		ec.unmarshalInputNewLike,
 		ec.unmarshalInputNewLogin,
@@ -728,6 +743,30 @@ func (ec *executionContext) field_Mutation_Login_args(ctx context.Context, rawAr
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_answerComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["comment_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment_id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["comment_id"] = arg0
+	var arg1 request.NewAnswerComment
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNNewAnswerComment2githubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐNewAnswerComment(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -2378,6 +2417,78 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_answerComment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_answerComment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AnswerComment(rctx, fc.Args["comment_id"].(string), fc.Args["input"].(request.NewAnswerComment))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*request.Comment)
+	fc.Result = res
+	return ec.marshalNComment2ᚖgithubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_answerComment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Comment_id(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Comment_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Comment_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Comment_deleted_at(ctx, field)
+			case "description":
+				return ec.fieldContext_Comment_description(ctx, field)
+			case "user":
+				return ec.fieldContext_Comment_user(ctx, field)
+			case "post":
+				return ec.fieldContext_Comment_post(ctx, field)
+			case "like":
+				return ec.fieldContext_Comment_like(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_answerComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -5782,6 +5893,42 @@ func (ec *executionContext) unmarshalInputFilterPost(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewAnswerComment(ctx context.Context, obj interface{}) (request.NewAnswerComment, error) {
+	var it request.NewAnswerComment
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"user_id", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "user_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
+			it.UserID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj interface{}) (request.NewComment, error) {
 	var it request.NewComment
 	asMap := map[string]interface{}{}
@@ -6305,6 +6452,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createComment(ctx, field)
+			})
+
+		case "answerComment":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_answerComment(ctx, field)
 			})
 
 		case "updateComment":
@@ -7131,6 +7284,11 @@ func (ec *executionContext) marshalNLike2ᚖgithubᚗcomᚋtriadmokoᚋgrahpql�
 		return graphql.Null
 	}
 	return ec._Like(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNNewAnswerComment2githubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐNewAnswerComment(ctx context.Context, v interface{}) (request.NewAnswerComment, error) {
+	res, err := ec.unmarshalInputNewAnswerComment(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewComment2githubᚗcomᚋtriadmokoᚋgrahpqlᚑgolangᚋgraphᚋrequestᚐNewComment(ctx context.Context, v interface{}) (request.NewComment, error) {

@@ -1,4 +1,8 @@
 # PROJECT CONFIG
+## Design Database Postgresql
+
+![Desing Database](assets/design_database.png)
+
 ## Prerequisite
 - Golang 1.19+
 - GORM
@@ -116,3 +120,17 @@ Membuat API untuk aplikasi Blog yang memiliki fitur:
     **Send Mail Like**
 
 6. Jika user `A` misalnya mengomentari postingan user lain, kemudian komentar tersebut dikomentari user lainnya, maka user `A` mendapatkan notifikasi email bahwa komentarnya dikomentari. 
+
+    ![Answer Comment](assets/request_answer_comment.png)
+
+    **Answer Comment**
+
+    ![Mail Answer Comment](assets/mail_answer_comment.png)
+
+    **Mail Comment**
+
+7. Terdapat fitur search berdasarkan posting title.
+    ![Post List Comment](assets/post_lists.png)
+
+    **Post List Comment**
+
