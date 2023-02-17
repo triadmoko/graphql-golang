@@ -129,8 +129,12 @@ func (r *mutationResolver) DetailPost(ctx context.Context, id string) (*request.
 				return nil, err
 			}
 			post.Comments = comments
-		case "like":
-
+		case "total_like":
+			count, err := r.LikeService.Count(ctx, post.ID)
+			if err != nil {
+				return nil, err
+			}
+			post.TotalLike = &count
 		}
 	}
 	return post, nil
@@ -173,18 +177,17 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (string
 }
 
 // Like is the resolver for the Like field.
-func (r *mutationResolver) Like(ctx context.Context, id string, input request.NewLike) (*request.Like, error) {
+func (r *mutationResolver) Like(ctx context.Context, input request.NewLike) (*request.Like, error) {
 	sess, oke := ctx.Value("sess").(*helpers.MetaToken)
 	if !oke {
 		return nil, errors.New("session invalid")
 	}
-	fmt.Println(helpers.PrettyPrint(sess))
-	return &request.Like{}, nil
-}
-
-// UnLike is the resolver for the UnLike field.
-func (r *mutationResolver) UnLike(ctx context.Context, id string, input request.NewLike) (*request.Like, error) {
-	panic(fmt.Errorf("not implemented: UnLike - UnLike"))
+	input.UserID = &sess.ID
+	response, err := r.LikeService.Like(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
 }
 
 // User is the resolver for the user field.
@@ -221,6 +224,9 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *mutationResolver) UnLike(ctx context.Context, input request.NewLike) (*request.Like, error) {
+	panic(fmt.Errorf("not implemented: UnLike - UnLike"))
+}
 func (r *queryResolver) CommentList(ctx context.Context, filter *request.FilterComment) (*request.CommentList, error) {
 	panic(fmt.Errorf("not implemented: User - user"))
 }

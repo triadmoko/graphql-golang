@@ -41,10 +41,8 @@ type Like struct {
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at"`
-	Type      string     `json:"type"`
-	User      []*User    `json:"user"`
-	Comment   []*Comment `json:"comment"`
-	Post      []*Post    `json:"post"`
+	Post      *Post      `json:"post"`
+	User      *User      `json:"user"`
 }
 
 type NewComment struct {
@@ -54,7 +52,8 @@ type NewComment struct {
 }
 
 type NewLike struct {
-	Type string `json:"type"`
+	UserID *string `json:"user_id"`
+	PostID string  `json:"post_id"`
 }
 
 type NewLogin struct {
@@ -91,6 +90,7 @@ type Post struct {
 	UpdatedAt   time.Time    `json:"updated_at"`
 	Title       string       `json:"title"`
 	Description string       `json:"description"`
+	TotalLike   *int         `json:"total_like"`
 	User        *User        `json:"user"`
 	Comments    *CommentList `json:"comments"`
 }

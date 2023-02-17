@@ -16,6 +16,7 @@ type Post {
   updated_at:Time!
   title: String!
   description:String!
+  total_like:Int
   user:User!
   comments:CommentList
 }
@@ -54,10 +55,8 @@ type Like {
   created_at: Time!
   updated_at: Time!
   deleted_at: Time
-  type: String!
-  user:[User]!
-  comment:[Comment]!
-  post:[Post]!
+  post: Post!
+  user: User!
 }
 
 type Token {
@@ -112,7 +111,8 @@ input NewComment {
 }
 
 input NewLike {
-  type: String!
+  user_id: String
+  post_id: String!
 }
 
 # Query
@@ -140,6 +140,5 @@ type Mutation {
   updateComment(id:String!, input:NewComment!): Comment!
   deleteComment(id:String!): String!
 
-  Like(id:String!, input:NewLike!): Like!
-  UnLike(id:String!, input:NewLike!): Like!
+  Like(input:NewLike!): Like!
 }

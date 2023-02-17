@@ -12,9 +12,10 @@ func GraphqlHandler(injection *injector.Injector) gin.HandlerFunc {
 	// NewExecutableSchema and Config are in the generated.go file
 	conf := graph.Config{
 		Resolvers: &resolver.Resolver{
-			User:    injection.User,
-			Post:    injection.Post,
-			Comment: injection.Comment,
+			User:        injection.User,
+			Post:        injection.Post,
+			Comment:     injection.Comment,
+			LikeService: injection.Like,
 		},
 	}
 	exec := graph.NewExecutableSchema(conf)
