@@ -130,7 +130,7 @@ Membuat API untuk aplikasi Blog yang memiliki fitur:
     **Mail Comment**
 
 7. Terdapat fitur search berdasarkan posting title.
-    ![Post List Comment](assets/post_lists.png)
+    ![Post List Search](assets/post_lists.png)
 
-    **Post List Comment**
+    **Post List Search**
 
