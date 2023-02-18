@@ -134,3 +134,10 @@ Membuat API untuk aplikasi Blog yang memiliki fitur:
 
     **Post List Search**
 
+
+8. Setiap akses ke API terdapat `log` yang disimpan ke `mongodb` dengan isi `log` sebagai berikut: `path` yang diakses, detail user, lama waktu akses API, objek `request`, objek `response` dan `timestamp`.
+    ![logs](assets/logs.png)
+
+    **logs**
+
+

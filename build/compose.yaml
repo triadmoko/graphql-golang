@@ -11,6 +11,7 @@ services:
         - "8081:8081"
       depends_on:
         - db
+        - mongo
       volumes:
         - ../app:/app
 
@@ -26,7 +27,23 @@ services:
       volumes:
         - pg_data:/var/lib/postgresql/data
 
-
+    mongo:
+      image: mongo:latest
+      depends_on:
+        - db
+      restart: always
+      ports:
+        - 27017:27017
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: spuser
+        MONGO_INITDB_ROOT_PASSWORD: secret
+        MONGO_INITDB_DATABASE: graphql
+        MONGO_USER: spuser
+        MONGO_DB: graphql
+        MONGO_PASSWORD: secret
+      volumes:
+        - ./mongo:/docker-entrypoint-initdb.d      
+        - ./mongo/data:/data/db:rw
 volumes:
   pg_data:     
 # Networks to be created to facilitate communication between containers

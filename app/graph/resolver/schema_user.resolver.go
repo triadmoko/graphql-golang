@@ -115,7 +115,6 @@ func (r *mutationResolver) DetailPost(ctx context.Context, id string) (*request.
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(helpers.PrettyPrint(preloads))
 	for _, preload := range preloads {
 		switch preload {
 		case "user":
