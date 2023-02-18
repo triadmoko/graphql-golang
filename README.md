@@ -14,6 +14,7 @@
 - Gqlgen 
 - Gin Gonic 
 - GoMigrate
+- MongoDB
 
 ## ENV
 ```env
@@ -33,6 +34,8 @@ CONFIG_SMTP_HOST=
 CONFIG_SMTP_PORT=
 CONFIG_AUTH_EMAIL=
 CONFIG_AUTH_PASSWORD=
+
+MONGO_URL=mongodb://spuser:secret@mongo/graphql?ssl=false&authSource=admin
 ```
 
 # GRAPHQL TEST CASE
